@@ -7,11 +7,12 @@ import PortfolioSlider from './components/home/PortfolioSlider';
 import BrandMarquee from './components/home/BrandMarquee';
 import ProductCollection from './components/home/ProductCollection';
 import PromoSection from './components/home/PromoSection';
+import Testimonials from './components/home/Testimonials';
 import ContactSection from './components/home/ContactSection';
 import Footer from './components/layout/Footer';
 
 const Home = () => (
-  <div className="relative bg-[#FDF8F0]">
+  <main className="relative bg-[#FDF8F0]">
     <Navbar />
     <Hero />
     <IntroStatement />
@@ -20,9 +21,10 @@ const Home = () => (
     <BrandMarquee />
     <ProductCollection />
     <PromoSection />
+    <Testimonials />
     <ContactSection />
     <Footer />
-  </div>
+  </main>
 );
 
 function App() {
