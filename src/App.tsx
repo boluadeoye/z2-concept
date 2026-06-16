@@ -17,6 +17,7 @@ import AboutPage from './pages/About';
 import PortfolioPage from './pages/Portfolio';
 import StorePage from './pages/Store';
 import ProjectDetail from './pages/ProjectDetail';
+import ProductDetail from './pages/ProductDetail';
 
 const Home = () => (
   <div className="relative">
@@ -29,6 +30,14 @@ const Home = () => (
     <PromoSection />
     <Testimonials />
     <ContactSection />
+  </div>
+);
+
+// Simple 404 Component for debugging
+const NotFound = () => (
+  <div className="h-[60vh] flex flex-col items-center justify-center bg-[#FDF8F0]">
+    <h2 className="text-4xl font-black text-black uppercase">404 - Route Not Found</h2>
+    <p className="text-black/40 mt-4">The URL you entered does not match any defined routes.</p>
   </div>
 );
 
@@ -45,6 +54,9 @@ function App() {
             <Route path="/portfolio" element={<PortfolioPage />} />
             <Route path="/portfolio/:slug" element={<ProjectDetail />} />
             <Route path="/store" element={<StorePage />} />
+            <Route path="/product/:id" element={<ProductDetail />} />
+            {/* Catch-all route to prevent blank screens */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
         <Footer />
