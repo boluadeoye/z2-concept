@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import { Heart, Minus, Plus } from "lucide-react";
 import { Reveal } from "../shared/Reveal";
+import { useCart } from "../../context/CartContext";
 
 export default function ProductMain({ product }: { product: any }) {
   const [qty, setQty] = useState(1);
+  const { addToCart } = useCart();
+
   const imageUrl = product.images?.[0]?.src || "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521130/blog_assets/dsitt1fhtiod9dkndedz.png";
 
   return (
@@ -26,13 +29,20 @@ export default function ProductMain({ product }: { product: any }) {
           </div>
           <div className="text-black/60 text-sm md:text-base leading-relaxed mb-10 max-w-[60ch]" dangerouslySetInnerHTML={{ __html: product.short_description || product.description }} />
           <div className="text-4xl font-black text-[#FF6B35] mb-10">₦{Number(product.price || 0).toLocaleString()}</div>
+          
           <div className="flex flex-wrap items-center gap-6 mt-auto">
             <div className="flex items-center bg-white border border-black/10 rounded-full px-4 py-2 shadow-sm">
-              <button onClick={() => setQty(Math.max(1, qty - 1))} className="p-2 text-black/40"><Minus size={16} /></button>
+              <button onClick={() => setQty(Math.max(1, qty - 1))} className="p-2 text-black/40 hover:text-black"><Minus size={16} /></button>
               <span className="w-12 text-center font-bold text-sm">{qty}</span>
-              <button onClick={() => setQty(qty + 1)} className="p-2 text-black/40"><Plus size={16} /></button>
+              <button onClick={() => setQty(qty + 1)} className="p-2 text-black/40 hover:text-black"><Plus size={16} /></button>
             </div>
-            <button className="bg-white border border-black/10 text-black rounded-full px-10 py-4 text-[11px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all shadow-md">Add to cart</button>
+
+            <button 
+              onClick={() => addToCart(product, qty)}
+              className="bg-white border border-black/10 text-black rounded-full px-10 py-4 text-[11px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all shadow-md"
+            >
+              Add to cart
+            </button>
           </div>
         </Reveal>
       </div>

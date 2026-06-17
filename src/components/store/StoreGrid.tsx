@@ -3,10 +3,12 @@ import { Link } from "react-router-dom";
 import { ShoppingBag, Search, ChevronDown, ChevronRight } from "lucide-react";
 import { Reveal } from "../shared/Reveal";
 import { getWooProducts } from "../../lib/woocommerce";
+import { useCart } from "../../context/CartContext";
 
 export default function StoreGrid() {
   const [products, setProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const { addToCart } = useCart();
 
   useEffect(() => {
     async function loadStore() {
@@ -21,6 +23,11 @@ export default function StoreGrid() {
       p.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [products, searchQuery]);
+
+  const handleAddToCart = (e: React.MouseEvent, product: any) => {
+    e.preventDefault(); // Stop navigation to detail page
+    addToCart(product, 1);
+  };
 
   return (
     <section className="py-24 md:py-32 px-6 md:px-12 bg-[#FDF8F0]">
@@ -54,13 +61,16 @@ export default function StoreGrid() {
                 <div className="flex items-end justify-between px-1">
                   <div className="max-w-[70%]">
                     <h3 className="text-[13px] font-bold text-black uppercase tracking-tight mb-1 truncate">{p.name}</h3>
-                    <p className="text-black/40 text-[11px] font-bold">₦{p.price}</p>
+                    <p className="text-black/40 text-[11px] font-bold">₦{Number(p.price || 0).toLocaleString()}</p>
                   </div>
-                  <div className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all ${
-                    i % 4 === 2 ? "bg-[#FF6B35] border-[#FF6B35] text-white shadow-lg scale-110" : "bg-white border-black/10 text-black hover:border-[#FF6B35]"
-                  }`}>
+                  <button 
+                    onClick={(e) => handleAddToCart(e, p)}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all ${
+                      i % 4 === 2 ? "bg-[#FF6B35] border-[#FF6B35] text-white shadow-lg scale-110" : "bg-white border-black/10 text-black hover:border-[#FF6B35]"
+                    }`}
+                  >
                     <ShoppingBag size={16} strokeWidth={2.5} />
-                  </div>
+                  </button>
                 </div>
               </Link>
             </Reveal>

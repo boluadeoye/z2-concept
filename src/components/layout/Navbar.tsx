@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ShoppingBag, Search, Menu, X, ArrowUpRight } from "lucide-react";
+import { useCart } from "../../context/CartContext";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { cart } = useCart();
+  
+  // Live Cart Calculation
+  const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -26,7 +31,7 @@ export default function Navbar() {
           
           {/* LEFT: Logo (Solid Anchor) */}
           <div className="flex-shrink-0">
-            <Link href="/" className="flex items-center gap-3 group">
+            <Link to="/" className="flex items-center gap-3 group">
               <span className="text-2xl lg:text-3xl font-black text-[#8B7E3D] tracking-tighter">Z2</span>
               <span className="text-[8px] lg:text-[9px] uppercase tracking-[0.4em] text-white font-bold pt-1 whitespace-nowrap">
                 CONCEPT X KEFEE HP
@@ -59,8 +64,13 @@ export default function Navbar() {
           {/* RIGHT: Actions (Solid Anchor) */}
           <div className="flex-shrink-0 flex items-center gap-4 lg:gap-6">
             <div className="flex items-center gap-3">
-              <Link to="/store" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-black hover:bg-[#FF6B35] hover:text-white transition-all">
+              <Link to="/cart" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-black hover:bg-[#FF6B35] hover:text-white transition-all relative">
                 <ShoppingBag size={16} strokeWidth={2.5} />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#FF6B35] text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-black">
+                    {cartCount}
+                  </span>
+                )}
               </Link>
               <button className="w-10 h-10 rounded-full bg-[#FF6B35] flex items-center justify-center text-white hover:bg-[#E76F51] transition-all">
                 <Search size={16} strokeWidth={2.5} />
@@ -79,7 +89,7 @@ export default function Navbar() {
             MOBILE CONTAINER (Visible < 768px)
             ========================================== */}
         <div className="flex md:hidden h-full items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <span className="text-2xl font-black text-[#8B7E3D] tracking-tighter">Z2</span>
             <span className="text-[8px] uppercase tracking-[0.3em] text-white font-bold pt-1">
               CONCEPT X KEFEE HP
@@ -87,8 +97,13 @@ export default function Navbar() {
           </Link>
 
           <div className="flex items-center gap-3">
-            <Link to="/store" className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-black">
+            <Link to="/cart" className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-black relative">
               <ShoppingBag size={14} />
+              {cartCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#FF6B35] text-white text-[8px] font-black rounded-full flex items-center justify-center border border-black">
+                  {cartCount}
+                </span>
+              )}
             </Link>
             <button className="w-8 h-8 rounded-full bg-[#FF6B35] flex items-center justify-center text-white">
               <Search size={14} />

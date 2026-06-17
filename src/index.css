@@ -13,10 +13,19 @@
 }
 
 @layer base {
-  html { scroll-behavior: smooth; }
-  html, body { overflow-x: clip; width: 100dvw; }
-  *, ::before, ::after { font-family: var(--font-sans) !important; }
-  body { @apply bg-background text-ink antialiased; }
+  html { 
+    scroll-behavior: smooth; 
+  }
+  
+  /* Removed overflow-x: clip to enable sticky positioning */
+  body {
+    @apply bg-background text-ink antialiased;
+    width: 100%;
+  }
+
+  *, ::before, ::after {
+    font-family: var(--font-sans) !important;
+  }
 }
 
 @utility no-scrollbar {
@@ -28,4 +37,8 @@
 .font-serif-italic {
   font-family: var(--font-serif) !important;
   font-style: italic !important;
+}
+
+.btn-pill {
+  @apply px-8 py-3 rounded-full font-bold uppercase tracking-widest text-[10px] transition-all duration-300 flex items-center gap-2;
 }
