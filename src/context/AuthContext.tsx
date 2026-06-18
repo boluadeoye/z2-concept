@@ -1,18 +1,8 @@
 "use client";
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { loginUser } from "../lib/woocommerce";
 
-const ck = import.meta.env.VITE_WC_CONSUMER_KEY;
-const cs = import.meta.env.VITE_WC_CONSUMER_SECRET;
-const siteUrl = 'https://sleigh.staymedia.ng';
-const isDev = import.meta.env.DEV;
-const baseUrl = isDev ? '' : siteUrl;
-
-type User = {
-  token: string;
-  name: string;
-  id: number | null;
-  email: string;
-} | null;
+type User = { token: string; name: string; id: number | null; email: string; } | null;
 
 type AuthContextType = {
   user: User;
@@ -30,45 +20,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const savedUser = localStorage.getItem("z2_user");
     if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
-        localStorage.removeItem("z2_user");
-      }
+      try { setUser(JSON.parse(savedUser)); } catch (e) { localStorage.removeItem("z2_user"); }
     }
     setLoading(false);
   }, []);
 
   const login = async (username: string, password: string) => {
-    try {
-      // 1. JWT Handshake
-      const authRes = await fetch(`${baseUrl}/wp-json/jwt-auth/v1/token`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-
-      const authData = await authRes.json();
-      if (!authRes.ok) throw new Error(authData.message || "Invalid credentials");
-
-      // 2. Fetch WooCommerce Customer ID
-      const userRes = await fetch(`${baseUrl}/wp-json/wc/v3/customers?email=${encodeURIComponent(username)}&consumer_key=${ck}&consumer_secret=${cs}`);
-      const userData = await userRes.json();
-      const customerId = userData.length > 0 ? userData[0].id : null;
-
-      const newUser = {
-        token: authData.token,
-        name: authData.user_display_name,
-        id: customerId,
-        email: username
-      };
-
+    const result = await loginUser(username, password);
+    if (result.success) {
+      const newUser = { token: result.token!, name: result.name!, id: result.id, email: username };
       setUser(newUser);
       localStorage.setItem("z2_user", JSON.stringify(newUser));
       return { success: true };
-    } catch (e: any) {
-      return { success: false, error: e.message };
     }
+    return { success: false, error: result.error };
   };
 
   const logout = () => {

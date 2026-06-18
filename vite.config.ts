@@ -14,10 +14,10 @@ export default defineConfig({
     port: 5173,
     host: true,
     proxy: {
-      '/wp-json': {
-        target: 'https://sleigh.staymedia.ng',
+      '/wp-api': {
+        target: 'https://sleigh.staymedia.ng/wp-json',
         changeOrigin: true,
-        secure: false,
+        rewrite: (path) => path.replace(/^\/wp-api/, ''),
       }
     }
   }

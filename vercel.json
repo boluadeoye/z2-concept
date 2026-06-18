@@ -1,6 +1,7 @@
 {
   "version": 2,
   "rewrites": [
+    { "source": "/wp-api/(.*)", "destination": "https://sleigh.staymedia.ng/wp-json/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

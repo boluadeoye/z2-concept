@@ -22,19 +22,19 @@ type CartContextType = {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
-  const [cart, setCart] = useState<CartItem[]>([]);
-
-  useEffect(() => {
+  // LAZY INITIALIZER: Prevents cart data loss on refresh
+  const [cart, setCart] = useState<CartItem[]>(() => {
     const savedCart = localStorage.getItem("z2_cart");
     if (savedCart) {
       try {
         const parsed = JSON.parse(savedCart);
-        if (Array.isArray(parsed)) setCart(parsed);
+        if (Array.isArray(parsed)) return parsed;
       } catch (e) {
         localStorage.removeItem("z2_cart");
       }
     }
-  }, []);
+    return [];
+  });
 
   useEffect(() => {
     localStorage.setItem("z2_cart", JSON.stringify(cart));
@@ -54,18 +54,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         );
       }
 
-      // CLEAN PRICE LOGIC: Strip ₦ and commas
-      const rawPrice = variation?.price || product.price || "0";
-      const cleanPrice = parseFloat(String(rawPrice).replace(/[^\d.]/g, ""));
-
       return [
         ...prev,
         {
           id: product.id,
           variationId: variation?.id,
           name: product.name,
-          price: cleanPrice,
-          image: variation?.image?.src || product.images?.[0]?.src || "",
+          price: parseFloat(product.price || "0"),
+          image: product.images?.[0]?.src || "",
           quantity: qty,
         },
       ];
@@ -79,7 +75,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const updateQuantity = (id: number | string, delta: number, variationId?: number) => {
     setCart((prev) =>
       prev.map((item) =>
-        (variationId ? item.variationId === variationId : item.id === id && !item.variationId)
+        (variationId ? item.variationId === variationId : (item.id === id && !item.variationId))
           ? { ...item, quantity: Math.max(1, item.quantity + delta) }
           : item
       )
@@ -91,7 +87,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("z2_cart");
   };
 
-  const subtotal = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+  const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   return (
     <CartContext.Provider value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart, subtotal }}>
@@ -102,6 +98,6 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (context === undefined) throw new Error("useCart must be used within a CartProvider");
+  if (context === undefined) throw new Error("useCart must be used within CartProvider");
   return context;
 };
