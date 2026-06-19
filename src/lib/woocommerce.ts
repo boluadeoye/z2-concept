@@ -173,3 +173,25 @@ export async function createWooOrder(payload: any) {
     return { success: false, error: e.message };
   }
 }
+
+// 13. INQUIRY ENGINE (CF7) - RESTORED
+export async function submitInquiry(name: string, email: string, message: string) {
+  try {
+    const FORM_ID = "8";
+    const url = `${baseUrl}/wp-api/contact-form-7/v1/contact-forms/${FORM_ID}/feedback?consumer_key=${ck}&consumer_secret=${cs}`;
+    const formData = new FormData();
+    formData.append("your-name", name);
+    formData.append("your-email", email);
+    formData.append("your-message", message);
+    formData.append("_wpcf7", FORM_ID);
+
+    const res = await fetch(url, {
+      method: "POST",
+      body: formData
+    });
+    const result = await res.json();
+    return { success: result.status === "mail_sent" || result.status === "mail_failed" };
+  } catch (e) {
+    return { success: false, error: "Connection error" };
+  }
+}
