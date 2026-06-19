@@ -61,7 +61,7 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* CONTACT US: Gold Icons */}
+            {/* CONTACT US: Gold Icons + Compact Address Wrap */}
             <div className="col-span-2 md:col-span-1 min-w-0 md:min-w-[240px]">
               <h4 className="text-[#FF6B35] font-bold text-[15px] mb-6 md:mb-10">Contact Us</h4>
               <ul className="space-y-5 text-[14px] text-white/70 font-medium">
@@ -75,7 +75,9 @@ export default function Footer() {
                 </li>
                 <li className="flex items-start gap-4">
                   <MapPin size={18} className="text-[#8B7E3D] mt-1 shrink-0" />
-                  <span className="leading-relaxed">24, Oguntolu street Shomolu, Lagos</span>
+                  <span className="leading-relaxed max-w-[20ch]">
+                    24, Oguntolu Street, Shomolu, Lagos
+                  </span>
                 </li>
               </ul>
             </div>

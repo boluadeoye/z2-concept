@@ -6,107 +6,118 @@ import { getWPPortfolios } from "../../lib/woocommerce";
 
 const categories = ["All", "Photography", "Video Coverage", "Website Development", "Graphic Design"];
 
-const mockProjects = [
-  { slug: "jessicas-wedding", title: "Jessica's Wedding Shoot", active: false, img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521115/blog_assets/ytxsfz4o5w7brat1zx4q.png" },
-  { slug: "event-coverage", title: "Event Coverage", active: true, img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521104/blog_assets/uhkj4l7sck5mdfvfbrpq.png" },
-  { slug: "unstoppable-print", title: "Unstoppable Print Website", active: false, img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521121/blog_assets/hbgy9tg3xwufbzemj3v0.png" }
-];
-
 export default function PortfolioGrid() {
   const [activeCat, setActiveCat] = useState("All");
   const [projects, setProjects] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadPortfolio() {
-      const data = await getWPPortfolios();
-      if (data && data.length > 0) {
-        // Map the WP API properties to our layout format
-        const mapped = data.map((item: any, i: number) => ({
-          slug: item.slug,
-          title: item.title?.rendered,
-          active: i === 1, // Keep second item active as per Figma
-          img: item._embedded?.['wp:featuredmedia']?.[0]?.source_url || "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521115/blog_assets/ytxsfz4o5w7brat1zx4q.png"
-        }));
-        setProjects(mapped);
-      } else {
-        setProductsFallback();
+      setLoading(true);
+      try {
+        const data = await getWPPortfolios();
+        if (data && data.length > 0) {
+          const mapped = data.map((item: any, i: number) => ({
+            slug: item.slug,
+            title: item.title?.rendered,
+            // Logic: Second item is active by default if it exists
+            active: i === 1, 
+            img: item._embedded?.['wp:featuredmedia']?.[0]?.source_url
+          })).filter(project => project.img); // Only show projects with valid media
+          
+          setProjects(mapped);
+        } else {
+          setProjects([]);
+        }
+      } catch (error) {
+        console.error("Portfolio Load Error:", error);
+        setProjects([]);
+      } finally {
+        setLoading(false);
       }
     }
-    
-    function setProductsFallback() {
-      setProjects(mockProjects);
-    }
-
     loadPortfolio();
   }, []);
 
   return (
-    <section className="py-24 md:py-32 px-6 md:px-12 bg-[#FDF8F0]">
-      <div className="max-w-7xl mx-auto">
-        
-        {/* ASYMMETRIC HEADER */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_0.6fr] gap-10 items-end mb-20">
-          <div className="flex flex-col items-start">
-            <Reveal>
-              <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white/50 mb-6 w-fit">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
-                <span className="font-mono text-[10px] text-black/60 font-bold uppercase tracking-widest">Our Works</span>
-              </div>
-              <h2 className="text-3xl md:text-5xl font-black text-black uppercase tracking-tight leading-[1.1] max-w-2xl">
-                Kefee Home Productions x Z2 Concepts your media partner
-              </h2>
-            </Reveal>
+    <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-[#FDF8F0]">
+      {/* ASYMMETRIC HEADER: Title Case Enforced */}
+      <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+        <Reveal>
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-black/10 bg-white w-fit mb-4">
+            <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
+            <span className="text-[10px] font-bold text-black/60 uppercase tracking-widest">Our Works</span>
           </div>
-          <div className="lg:text-right">
-            <Reveal>
-              <p className="text-black/60 text-sm md:text-base leading-relaxed max-w-[40ch] lg:ml-auto">
-                We offer the printing of graphics, text, logos, and other branding elements onto packaging materials...
-              </p>
-            </Reveal>
-          </div>
-        </div>
+          <h2 className="text-4xl md:text-6xl font-black text-black tracking-tight leading-[1.1] max-w-[20ch]">
+            Kefee Home Productions X Z2 Concepts Your Media Partner
+          </h2>
+        </Reveal>
+        <Reveal delay={0.2} className="max-w-md">
+          <p className="text-black/60 leading-relaxed text-sm md:text-base">
+            We offer the printing of graphics, text, logos, and other branding elements onto packaging materials...
+          </p>
+        </Reveal>
+      </div>
 
-        {/* FILTER BAR */}
-        <div className="flex overflow-x-auto no-scrollbar gap-3 mb-24 pb-4 border-b border-black/5">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCat(cat)}
-              className={`px-8 py-3 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all whitespace-nowrap ${
-                activeCat === cat ? "bg-[#FF6B35] text-white shadow-xl" : "bg-white border border-black/5 text-black/40 hover:border-black/20"
-              }`}
-            >
-              {cat}
-            </button>
+      {/* FILTER BAR */}
+      <div className="flex gap-3 mb-16 overflow-x-auto pb-4 no-scrollbar">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => setActiveCat(cat)}
+            className={`px-8 py-3 rounded-full text-[11px] font-bold transition-all whitespace-nowrap border ${
+              activeCat === cat
+                ? "bg-[#FF6B35] text-white border-[#FF6B35] shadow-xl shadow-[#FF6B35]/20"
+                : "bg-white border-black/5 text-black/40 hover:border-black/20"
+            }`}
+          >
+            {cat.toUpperCase()}
+          </button>
+        ))}
+      </div>
+
+      {/* GRID: Zero-Fallback Logic */}
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-pulse">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="aspect-square bg-black/5 rounded-[40px]" />
           ))}
         </div>
-
-        {/* 3-COLUMN GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-16 mb-24">
+      ) : projects.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {projects.map((project, i) => (
-            <Reveal key={i}>
+            <Reveal key={i} delay={i * 0.1}>
               <Link to={`/portfolio/${project.slug}`} className="group flex flex-col h-full">
-                <div className="relative aspect-square rounded-[32px] overflow-hidden mb-6 shadow-lg border border-black/5">
-                  <img src={project.img} alt={project.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                <div className="relative aspect-square rounded-[40px] overflow-hidden mb-6 shadow-2xl border border-black/5">
+                  <img 
+                    src={project.img} 
+                    alt={project.title} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                  />
                 </div>
-                <div className={`p-8 rounded-[28px] flex items-center justify-between transition-all duration-300 flex-1 min-h-[110px] ${
-                  project.active ? "bg-[#FF6B35] text-white shadow-2xl" : "bg-white text-black border border-black/5"
+                <div className={`p-8 rounded-[32px] flex items-center justify-between transition-all duration-500 flex-1 min-h-[120px] ${
+                  project.active 
+                    ? "bg-[#FF6B35] text-white shadow-2xl shadow-[#FF6B35]/30" 
+                    : "bg-white text-black border border-black/5 group-hover:border-[#FF6B35]/30"
                 }`}>
-                  <h3 className="text-[17px] font-bold uppercase leading-tight pr-4">
+                  <span className="text-xl font-bold tracking-tight leading-tight pr-4">
                     {project.title}
-                  </h3>
-                  <div className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 transition-all ${
+                  </span>
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-all ${
                     project.active ? "bg-white/20 text-white" : "bg-[#FF6B35]/10 text-[#FF6B35]"
                   }`}>
-                    <ArrowUpRight size={22} strokeWidth={3} className="rotate-45" />
+                    <ArrowUpRight size={24} />
                   </div>
                 </div>
               </Link>
             </Reveal>
           ))}
         </div>
-
-      </div>
+      ) : (
+        <div className="py-20 text-center">
+          <p className="text-black/20 font-bold text-xl tracking-widest uppercase">No Projects Found</p>
+        </div>
+      )}
     </section>
   );
 }
