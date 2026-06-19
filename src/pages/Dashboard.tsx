@@ -67,21 +67,21 @@ export default function DashboardPage() {
   );
 
   return (
-    <main className="bg-[#FDF8F0] min-h-screen pt-32 pb-24 overflow-x-auto no-scrollbar">
-      {/* FIXED FIGMA COMPOSITION: No responsive stacking. Side-by-side always. */}
-      <div className="w-[1140px] mx-auto px-6 grid grid-cols-[240px_1fr] gap-10 items-start">
+    <main className="bg-[#FDF8F0] min-h-screen pt-32 pb-24 px-4 md:px-6 lg:px-8">
+      {/* FIGMA ALIGNMENT: Side-by-side restored for md+ viewports */}
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[240px_1fr] gap-6 lg:gap-10 items-start">
         
-        {/* SIDEBAR: Fixed Width Pillar */}
-        <aside className="w-[240px] shrink-0">
-          <div className="bg-white rounded-[24px] p-5 shadow-[0_4px_25px_rgba(0,0,0,0.02)] border border-black/5">
-            <nav className="flex flex-col gap-1.5">
+        {/* SIDEBAR: Floating Card (Sticky removed for mobile/tablet to prevent overlap) */}
+        <aside className="w-full xl:sticky xl:top-32">
+          <div className="bg-white rounded-[24px] p-4 shadow-[0_4px_20px_rgba(0,0,0,0.02)] border border-black/5">
+            <nav className="flex flex-col gap-1">
               {menuItems.map((item) => (
                 <button
                   key={item}
                   onClick={() => setActiveTab(item)}
-                  className={`w-full text-left px-6 py-4 rounded-xl text-[13px] font-bold transition-all duration-300 ${
+                  className={`w-full text-left px-6 py-3.5 rounded-xl text-[13px] font-bold transition-all duration-300 ${
                     activeTab === item 
-                      ? "bg-[#FF6B35] text-white shadow-lg translate-x-1" 
+                      ? "bg-[#FF6B35] text-white shadow-lg" 
                       : "text-black/40 hover:bg-black/5 hover:text-black"
                   }`}
                 >
@@ -90,10 +90,10 @@ export default function DashboardPage() {
               ))}
             </nav>
             
-            <div className="mt-6 pt-6 border-t border-black/5">
+            <div className="mt-4 pt-4 border-t border-black/5">
               <button 
                 onClick={logout} 
-                className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl text-[13px] font-bold text-black bg-[#FDF8F0] hover:bg-black hover:text-white transition-all"
+                className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-[13px] font-bold text-black bg-[#FDF8F0] hover:bg-black hover:text-white transition-all"
               >
                 <LogOut size={16} /> Log Out
               </button>
@@ -101,14 +101,14 @@ export default function DashboardPage() {
           </div>
         </aside>
 
-        {/* CONTENT: Fixed Proportional Card */}
-        <section className="bg-white rounded-[32px] p-12 shadow-[0_15px_50px_rgba(0,0,0,0.03)] border border-black/5 min-h-[700px] w-full">
-          <header className="mb-12">
-            <h2 className="text-4xl font-bold text-black tracking-tight">{activeTab}</h2>
-            <div className="h-1 w-10 bg-[#FF6B35] rounded-full mt-4" />
+        {/* CONTENT AREA: Floating Card (Title Case) */}
+        <section className="bg-white rounded-[32px] p-6 md:p-10 lg:p-12 shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-black/5 min-h-[600px] overflow-hidden">
+          <header className="mb-8 md:mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-black tracking-tight">{activeTab}</h2>
+            <div className="h-[1px] bg-black/5 w-full mt-6" />
           </header>
 
-          <div className="w-full">
+          <div className="w-full overflow-x-auto no-scrollbar">
             {activeTab === "Dashboard" && (
               <DashboardOverview user={user} orders={orders} loading={loading} onViewOrder={setSelectedOrder} statusStyle={getStatusStyles} />
             )}
@@ -126,8 +126,8 @@ export default function DashboardPage() {
             )}
 
             {activeTab === "Payment method" && (
-              <div className="py-32 text-center space-y-4">
-                <CreditCard size={48} className="mx-auto text-black/5" />
+              <div className="py-24 text-center space-y-4">
+                <CreditCard size={40} className="mx-auto text-black/10" />
                 <p className="text-sm font-bold text-black/30">No saved payment methods</p>
               </div>
             )}
@@ -142,37 +142,37 @@ export default function DashboardPage() {
       {/* ORDER DETAIL LIGHTBOX */}
       <AnimatePresence>
         {selectedOrder && (
-          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-6">
             <motion.div 
               initial={{ opacity: 0 }} 
               animate={{ opacity: 1 }} 
               exit={{ opacity: 0 }} 
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm" 
+              className="absolute inset-0 bg-black/40 backdrop-blur-sm" 
               onClick={() => setSelectedOrder(null)} 
             />
             <motion.div 
               initial={{ opacity: 0, scale: 0.98 }} 
               animate={{ opacity: 1, scale: 1 }} 
               exit={{ opacity: 0, scale: 0.98 }} 
-              className="relative bg-white rounded-[40px] overflow-hidden shadow-2xl w-full max-w-2xl z-10 border border-black/5"
+              className="relative bg-white rounded-[24px] md:rounded-[32px] overflow-hidden shadow-2xl w-full max-w-xl z-10 border border-black/5"
             >
-              <div className="p-8 border-b border-black/5 flex justify-between items-center">
-                <h3 className="text-xl font-bold">Order #{selectedOrder.id}</h3>
-                <button onClick={() => setSelectedOrder(null)} className="p-3 hover:bg-black/5 rounded-full transition-colors">
-                  <X size={24} />
+              <div className="p-5 md:p-6 border-b border-black/5 flex justify-between items-center">
+                <h3 className="text-base md:text-lg font-bold">Order #{selectedOrder.id}</h3>
+                <button onClick={() => setSelectedOrder(null)} className="p-2 hover:bg-black/5 rounded-full transition-colors">
+                  <X size={20} />
                 </button>
               </div>
-              <div className="p-10 max-h-[60vh] overflow-y-auto no-scrollbar">
+              <div className="p-6 md:p-8 max-h-[60vh] overflow-y-auto no-scrollbar">
                 {selectedOrder.line_items?.map((item: any) => (
-                  <div key={item.id} className="flex justify-between py-5 border-b border-black/5 last:border-0">
-                    <span className="text-base font-medium text-black/70">{item.name} x{item.quantity}</span>
-                    <span className="text-base font-bold text-black">₦{parseFloat(item.total).toLocaleString()}</span>
+                  <div key={item.id} className="flex justify-between py-4 border-b border-black/5 last:border-0">
+                    <span className="text-xs md:text-sm font-medium text-black/70">{item.name} x{item.quantity}</span>
+                    <span className="text-xs md:text-sm font-bold text-black">₦{parseFloat(item.total).toLocaleString()}</span>
                   </div>
                 ))}
-                <div className="mt-8 pt-8 border-t-2 border-black/5">
+                <div className="mt-6 pt-6 border-t border-black/10">
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-black">Total</span>
-                    <span className="text-2xl font-bold text-[#FF6B35]">₦{parseFloat(selectedOrder.total).toLocaleString()}</span>
+                    <span className="text-sm md:text-base font-bold text-black">Total</span>
+                    <span className="text-lg md:text-xl font-bold text-[#FF6B35]">₦{parseFloat(selectedOrder.total).toLocaleString()}</span>
                   </div>
                 </div>
               </div>

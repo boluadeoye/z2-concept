@@ -1,9 +1,8 @@
 const ck = import.meta.env.VITE_WC_CONSUMER_KEY;
 const cs = import.meta.env.VITE_WC_CONSUMER_SECRET;
-const siteUrl = 'https://sleigh.staymedia.ng';
 
-const isDev = import.meta.env.DEV;
-const baseUrl = isDev ? '' : siteUrl;
+// ALWAYS use relative paths to trigger Vite Proxy (Dev) and Vercel Rewrites (Prod)
+const baseUrl = ''; 
 
 const requestHeaders = {
   'Content-Type': 'application/json'
@@ -48,17 +47,16 @@ export async function getSingleProduct(id: string) {
 // 4. BLOG POST FETCH
 export async function getWPPosts() {
   try {
-    const res = await fetch(`${baseUrl}/wp/v2/posts?_embed&per_page=6`);
+    const res = await fetch(`${baseUrl}/wp-api/wp/v2/posts?_embed&per_page=6`);
     if (!res.ok) return [];
     return res.json();
   } catch (e) { return []; }
 }
 
-// 5. NATIVE PORTFOLIO LIST FETCH (The Boss's Endpoint)
+// 5. NATIVE PORTFOLIO LIST FETCH
 export async function getWPPortfolios() {
   try {
-    // Uses the open endpoint verified in your URL test with _embed to grab high-res images
-    const res = await fetch(`${baseUrl}/wp/v2/portfolio?_embed&per_page=12`);
+    const res = await fetch(`${baseUrl}/wp-api/wp/v2/portfolio?_embed&per_page=12`);
     if (!res.ok) return [];
     return res.json();
   } catch (e) {
@@ -67,15 +65,14 @@ export async function getWPPortfolios() {
   }
 }
 
-// 6. NATIVE PORTFOLIO SINGLE FETCH (By Slug)
+// 6. NATIVE PORTFOLIO SINGLE FETCH
 export async function getSingleWPPortfolio(slug: string) {
   try {
-    const res = await fetch(`${baseUrl}/wp/v2/portfolio?slug=${slug}&_embed`);
+    const res = await fetch(`${baseUrl}/wp-api/wp/v2/portfolio?slug=${slug}&_embed`);
     if (!res.ok) return null;
     const items = await res.json();
     return items.length > 0 ? items[0] : null;
   } catch (e) {
-    console.error("WP Single Portfolio Error:", e);
     return null;
   }
 }
@@ -107,7 +104,7 @@ export async function updateCustomerAddress(id: string | number, shippingData: a
     const res = await fetch(url, {
       method: "PUT",
       headers: requestHeaders,
-      body: JSON.stringify({ shipping: shippingData })
+      body: JSON.stringify({ shipping: shippingData, billing: shippingData })
     });
     return { success: res.ok };
   } catch (e) { return { success: false }; }
@@ -116,7 +113,7 @@ export async function updateCustomerAddress(id: string | number, shippingData: a
 // 10. LOGIN ENGINE (JWT)
 export async function loginUser(username: string, password: string) {
   try {
-    const res = await fetch(`${baseUrl}/wp-json/jwt-auth/v1/token`, {
+    const res = await fetch(`${baseUrl}/wp-api/jwt-auth/v1/token`, {
       method: "POST",
       headers: requestHeaders,
       body: JSON.stringify({ username, password }),
@@ -124,14 +121,14 @@ export async function loginUser(username: string, password: string) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Invalid credentials");
 
-    const userRes = await fetch(`${baseUrl}/wp-json/wc/v3/customers?email=${encodeURIComponent(username)}&consumer_key=${ck}&consumer_secret=${cs}`);
+    const userRes = await fetch(`${baseUrl}/wp-api/wc/v3/customers?email=${encodeURIComponent(username)}&consumer_key=${ck}&consumer_secret=${cs}`);
     const userData = await userRes.json();
-    
-    return { 
-      success: true, 
-      token: data.token, 
-      name: data.user_display_name, 
-      id: userData.length > 0 ? userData[0].id : null 
+
+    return {
+      success: true,
+      token: data.token,
+      name: data.user_display_name,
+      id: userData.length > 0 ? userData[0].id : null
     };
   } catch (e: any) {
     return { success: false, error: e.message };
@@ -141,7 +138,7 @@ export async function loginUser(username: string, password: string) {
 // 11. REGISTRATION ENGINE
 export async function registerUser(userData: any) {
   try {
-    const res = await fetch(`${baseUrl}/wp-json/wc/v3/customers?consumer_key=${ck}&consumer_secret=${cs}`, {
+    const res = await fetch(`${baseUrl}/wp-api/wc/v3/customers?consumer_key=${ck}&consumer_secret=${cs}`, {
       method: "POST",
       headers: requestHeaders,
       body: JSON.stringify({
@@ -163,7 +160,7 @@ export async function registerUser(userData: any) {
 // 12. ORDER CREATION ENGINE
 export async function createWooOrder(payload: any) {
   try {
-    const url = `${baseUrl}/wp-json/wc/v3/orders?consumer_key=${ck}&consumer_secret=${cs}`;
+    const url = `${baseUrl}/wp-api/wc/v3/orders?consumer_key=${ck}&consumer_secret=${cs}`;
     const res = await fetch(url, {
       method: "POST",
       headers: requestHeaders,
@@ -174,27 +171,5 @@ export async function createWooOrder(payload: any) {
     return { success: true, orderId: order.id };
   } catch (e: any) {
     return { success: false, error: e.message };
-  }
-}
-
-// 13. INQUIRY ENGINE (CF7)
-export async function submitInquiry(name: string, email: string, message: string) {
-  try {
-    const FORM_ID = "8";
-    const url = `${baseUrl}/contact-form-7/v1/contact-forms/${FORM_ID}/feedback?consumer_key=${ck}&consumer_secret=${cs}`;
-    const formData = new FormData();
-    formData.append("your-name", name);
-    formData.append("your-email", email);
-    formData.append("your-message", message);
-    formData.append("_wpcf7", FORM_ID);
-    
-    const res = await fetch(url, { 
-      method: "POST",
-      body: formData 
-    });
-    const result = await res.json();
-    return { success: result.status === "mail_sent" || result.status === "mail_failed" };
-  } catch (e) { 
-    return { success: false, error: "Connection error" }; 
   }
 }
