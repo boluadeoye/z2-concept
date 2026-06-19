@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import AuthLayout from "../components/auth/AuthLayout";
 import { registerUser } from "../lib/woocommerce";
 
 export default function RegisterPage() {
   const [data, setData] = useState({ firstName: "", lastName: "", email: "", password: "" });
   const [status, setStatus] = useState({ type: "idle", msg: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -14,10 +15,10 @@ export default function RegisterPage() {
     setStatus({ type: "loading", msg: "" });
     const result = await registerUser(data);
     if (result.success) {
-      setStatus({ type: "success", msg: "Account created! Redirecting..." });
+      setStatus({ type: "success", msg: "Account Created! Redirecting..." });
       setTimeout(() => navigate("/login"), 2000);
     } else {
-      setStatus({ type: "error", msg: result.error || "Registration failed" });
+      setStatus({ type: "error", msg: result.error || "Registration Failed" });
     }
   };
 
@@ -25,7 +26,7 @@ export default function RegisterPage() {
     <AuthLayout>
       <div className="w-full text-left">
         <h1 className="text-[clamp(1.8rem,4vw,3rem)] font-black text-black mb-10 tracking-tight whitespace-nowrap">
-          Create account
+          Create Account
         </h1>
 
         {status.msg && (
@@ -41,25 +42,74 @@ export default function RegisterPage() {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">First Name</label>
-              <input type="text" required value={data.firstName} onChange={e => setData({...data, firstName: e.target.value})} className="w-full bg-[#FDF8F0]/40 border border-black/5 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all" />
+              <input 
+                type="text" 
+                required 
+                value={data.firstName} 
+                onChange={e => setData({...data, firstName: e.target.value})} 
+                className="w-full bg-[#FDF8F0]/40 border border-black/5 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all" 
+              />
             </div>
             <div className="space-y-2">
               <label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Last Name</label>
-              <input type="text" required value={data.lastName} onChange={e => setData({...data, lastName: e.target.value})} className="w-full bg-[#FDF8F0]/40 border border-black/5 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all" />
+              <input 
+                type="text" 
+                required 
+                value={data.lastName} 
+                onChange={e => setData({...data, lastName: e.target.value})} 
+                className="w-full bg-[#FDF8F0]/40 border border-black/5 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all" 
+              />
             </div>
           </div>
+
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Email address</label>
-            <input type="email" required value={data.email} onChange={e => setData({...data, email: e.target.value})} className="w-full bg-[#FDF8F0]/40 border border-black/5 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all" />
+            <label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Email Address</label>
+            <input 
+              type="email" 
+              name="email"
+              id="email"
+              autoComplete="email"
+              required 
+              value={data.email} 
+              onChange={e => setData({...data, email: e.target.value})} 
+              className="w-full bg-[#FDF8F0]/40 border border-black/5 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all" 
+            />
           </div>
+
           <div className="space-y-2">
             <label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Password</label>
-            <input type="password" required value={data.password} onChange={e => setData({...data, password: e.target.value})} className="w-full bg-[#FDF8F0]/40 border border-black/5 rounded-2xl px-6 py-4 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all" />
+            <div className="relative">
+              <input 
+                type={showPassword ? "text" : "password"} 
+                name="password"
+                id="password"
+                autoComplete="new-password"
+                required 
+                value={data.password} 
+                onChange={e => setData({...data, password: e.target.value})} 
+                className="w-full bg-[#FDF8F0]/40 border border-black/5 rounded-2xl px-6 pr-14 py-4 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all" 
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-black/30 hover:text-[#FF6B35] transition-colors"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
           </div>
-          <button type="submit" disabled={status.type === "loading"} className="w-full bg-black text-white py-6 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#FF6B35] transition-all shadow-xl flex items-center justify-center">
-            {status.type === "loading" ? <Loader2 className="animate-spin" size={20} /> : "Create my account"}
+
+          <button 
+            type="submit" 
+            disabled={status.type === "loading"} 
+            className="w-full bg-black text-white py-6 rounded-full text-[11px] font-black uppercase tracking-[0.2em] hover:bg-[#FF6B35] transition-all shadow-xl flex items-center justify-center"
+          >
+            {status.type === "loading" ? <Loader2 className="animate-spin" size={20} /> : "CREATE MY ACCOUNT"}
           </button>
-          <p className="text-left text-xs font-bold text-black/40 mt-6">Already have an account? <Link to="/login" className="text-[#FF6B35] underline">Log in</Link></p>
+
+          <p className="text-left text-xs font-bold text-black/40 mt-6">
+            Already Have An Account? <Link to="/login" className="text-[#FF6B35] underline">Log In</Link>
+          </p>
         </form>
       </div>
     </AuthLayout>

@@ -1,27 +1,25 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, Eye, EyeOff } from "lucide-react";
 import AuthLayout from "../components/auth/AuthLayout";
 import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
   const [data, setData] = useState({ username: "", password: "" });
   const [status, setStatus] = useState({ type: "idle", msg: "" });
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus({ type: "loading", msg: "" });
-    
     const result = await login(data.username, data.password);
-    
     if (result.success) {
-      setStatus({ type: "success", msg: "Welcome back! Redirecting to dashboard..." });
-      // REDIRECT CALIBRATION: Pointing to Dashboard instead of Home
+      setStatus({ type: "success", msg: "Welcome Back! Redirecting..." });
       setTimeout(() => navigate("/dashboard"), 1500);
     } else {
-      setStatus({ type: "error", msg: result.error || "Invalid username or password" });
+      setStatus({ type: "error", msg: result.error || "Invalid Username Or Password" });
     }
   };
 
@@ -29,7 +27,7 @@ export default function LoginPage() {
     <AuthLayout>
       <div className="w-full text-left">
         <h1 className="text-[clamp(1.8rem,4vw,3rem)] font-black text-black mb-10 tracking-tight whitespace-nowrap">
-          Welcome back
+          Welcome Back
         </h1>
 
         {status.msg && (
@@ -43,47 +41,62 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-8">
           <div className="space-y-2">
-            <label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Username or email address</label>
-            <input 
-              type="text" 
+            <label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Username Or Email Address</label>
+            <input
+              type="text"
+              name="username"
+              id="username"
+              autoComplete="username"
               required
               value={data.username}
               onChange={(e) => setData({...data, username: e.target.value})}
-              className="w-full bg-[#FDF8F0]/40 border border-black/5 rounded-2xl px-6 py-5 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all" 
+              className="w-full bg-[#FDF8F0]/40 border border-black/5 rounded-2xl px-6 py-5 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all"
             />
           </div>
 
           <div className="space-y-2">
             <label className="text-[10px] font-black uppercase tracking-widest text-black/40 ml-1">Password</label>
-            <input 
-              type="password" 
-              required
-              value={data.password}
-              onChange={(e) => setData({...data, password: e.target.value})}
-              className="w-full bg-[#FDF8F0]/40 border border-black/5 rounded-2xl px-6 py-5 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all" 
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                id="password"
+                autoComplete="current-password"
+                required
+                value={data.password}
+                onChange={(e) => setData({...data, password: e.target.value})}
+                className="w-full bg-[#FDF8F0]/40 border border-black/5 rounded-2xl px-6 pr-14 py-5 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-black/30 hover:text-[#FF6B35] transition-colors"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
           </div>
 
           <div className="flex items-center justify-between px-1">
             <label className="flex items-center gap-2 cursor-pointer group">
               <input type="checkbox" className="w-4 h-4 rounded border-black/20 text-[#FF6B35] focus:ring-0" />
-              <span className="text-xs font-bold text-black/60 group-hover:text-black transition-colors">Remember me</span>
+              <span className="text-xs font-bold text-black/60 group-hover:text-black transition-colors">Remember Me</span>
             </label>
-            <Link to="/forgot-password" title="Reset your password" className="text-xs font-bold text-[#FF6B35] hover:opacity-80 transition-opacity">
-              Forgot password
+            <Link to="/forgot-password" title="Reset Your Password" className="text-xs font-bold text-[#FF6B35] hover:opacity-80 transition-opacity">
+              Forgot Password
             </Link>
           </div>
 
-          <button 
+          <button
             type="submit"
             disabled={status.type === "loading"}
             className="w-full bg-[#FF6B35] text-white py-6 rounded-full text-[13px] font-black uppercase tracking-[0.2em] hover:bg-black transition-all shadow-xl shadow-[#FF6B35]/20 flex items-center justify-center"
           >
-            {status.type === "loading" ? <Loader2 className="animate-spin" size={20} /> : "Log in"}
+            {status.type === "loading" ? <Loader2 className="animate-spin" size={20} /> : "Log In"}
           </button>
 
           <p className="text-left text-xs font-bold text-black/40 mt-6">
-            Are you new here? <Link to="/register" className="text-[#FF6B35] underline">Sign up</Link>
+            Are You New Here? <Link to="/register" className="text-[#FF6B35] underline">Sign Up</Link>
           </p>
         </form>
       </div>
