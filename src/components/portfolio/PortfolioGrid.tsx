@@ -1,29 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowUpRight, ChevronRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "../shared/Reveal";
+import { getWPPortfolios } from "../../lib/woocommerce";
 
-const categories = ["All", "Photography", "Video Coverage", "Website Development", "Graphic Design", "AI Content Creation"];
+const categories = ["All", "Photography", "Video Coverage", "Website Development", "Graphic Design"];
 
-const projects = [
-  { slug: "jessicas-wedding", title: "Jessica's Wedding Shoot", category: "Photography", active: false, img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521115/blog_assets/ytxsfz4o5w7brat1zx4q.png" },
-  { slug: "event-coverage", title: "Event Coverage", category: "Video Coverage", active: true, img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521104/blog_assets/uhkj4l7sck5mdfvfbrpq.png" },
-  { slug: "unstoppable-print", title: "Unstoppable Print Website", category: "Website Development", active: false, img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521121/blog_assets/hbgy9tg3xwufbzemj3v0.png" },
-  { slug: "nkechis-graduation", title: "Nkechi's Graduation", category: "Photography", active: false, img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521115/blog_assets/ytxsfz4o5w7brat1zx4q.png" },
-  { slug: "shamammpraise-ecommerce", title: "Shamammpraise eCommerce Website", category: "Website Development", active: false, img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521121/blog_assets/hbgy9tg3xwufbzemj3v0.png" },
-  { slug: "pa-grahams-funeral", title: "Pa Graham's Funeral Coverage", category: "Video Coverage", active: false, img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521104/blog_assets/uhkj4l7sck5mdfvfbrpq.png" },
-  { slug: "church-website", title: "We Gathered Church Website", category: "Website Development", active: false, img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521121/blog_assets/hbgy9tg3xwufbzemj3v0.png" },
-  { slug: "swiss-content", title: "Swiss Content Creation", category: "AI Content Creation", active: false, img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521115/blog_assets/ytxsfz4o5w7brat1zx4q.png" },
-  { slug: "ecommerce-website", title: "e-Commerce Website", category: "Website Development", active: false, img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521121/blog_assets/hbgy9tg3xwufbzemj3v0.png" }
+const mockProjects = [
+  { slug: "jessicas-wedding", title: "Jessica's Wedding Shoot", active: false, img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521115/blog_assets/ytxsfz4o5w7brat1zx4q.png" },
+  { slug: "event-coverage", title: "Event Coverage", active: true, img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521104/blog_assets/uhkj4l7sck5mdfvfbrpq.png" },
+  { slug: "unstoppable-print", title: "Unstoppable Print Website", active: false, img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521121/blog_assets/hbgy9tg3xwufbzemj3v0.png" }
 ];
 
 export default function PortfolioGrid() {
   const [activeCat, setActiveCat] = useState("All");
+  const [projects, setProjects] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function loadPortfolio() {
+      const data = await getWPPortfolios();
+      if (data && data.length > 0) {
+        // Map the WP API properties to our layout format
+        const mapped = data.map((item: any, i: number) => ({
+          slug: item.slug,
+          title: item.title?.rendered,
+          active: i === 1, // Keep second item active as per Figma
+          img: item._embedded?.['wp:featuredmedia']?.[0]?.source_url || "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521115/blog_assets/ytxsfz4o5w7brat1zx4q.png"
+        }));
+        setProjects(mapped);
+      } else {
+        setProductsFallback();
+      }
+    }
+    
+    function setProductsFallback() {
+      setProjects(mockProjects);
+    }
+
+    loadPortfolio();
+  }, []);
 
   return (
     <section className="py-24 md:py-32 px-6 md:px-12 bg-[#FDF8F0]">
       <div className="max-w-7xl mx-auto">
         
+        {/* ASYMMETRIC HEADER */}
         <div className="grid grid-cols-1 lg:grid-cols-[1.4fr_0.6fr] gap-10 items-end mb-20">
           <div className="flex flex-col items-start">
             <Reveal>
@@ -45,6 +66,7 @@ export default function PortfolioGrid() {
           </div>
         </div>
 
+        {/* FILTER BAR */}
         <div className="flex overflow-x-auto no-scrollbar gap-3 mb-24 pb-4 border-b border-black/5">
           {categories.map((cat) => (
             <button
@@ -59,6 +81,7 @@ export default function PortfolioGrid() {
           ))}
         </div>
 
+        {/* 3-COLUMN GRID */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-16 mb-24">
           {projects.map((project, i) => (
             <Reveal key={i}>
@@ -82,6 +105,7 @@ export default function PortfolioGrid() {
             </Reveal>
           ))}
         </div>
+
       </div>
     </section>
   );
