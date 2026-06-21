@@ -195,3 +195,32 @@ export async function submitInquiry(name: string, email: string, message: string
     return { success: false, error: "Connection error" };
   }
 }
+
+// 14. PASSWORD RESET ENGINE
+export async function sendPasswordResetEmail(userLogin: string) {
+  try {
+    const res = await fetch(`${baseUrl}/wp-api/z2/v1/forgot-password`, {
+      method: "POST",
+      headers: requestHeaders,
+      body: JSON.stringify({ user_login: userLogin }),
+    });
+    const data = await res.json();
+    return { success: res.ok, message: data.message || "Request failed" };
+  } catch (e) {
+    return { success: false, error: "Connection error" };
+  }
+}
+
+export async function finalizePasswordReset(payload: any) {
+  try {
+    const res = await fetch(`${baseUrl}/wp-api/z2/v1/reset-password`, {
+      method: "POST",
+      headers: requestHeaders,
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    return { success: res.ok, message: data.message || "Reset failed" };
+  } catch (e) {
+    return { success: false, error: "Connection error" };
+  }
+}

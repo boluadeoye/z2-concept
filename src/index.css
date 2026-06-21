@@ -13,18 +13,15 @@
 }
 
 @layer base {
-  html { 
-    scroll-behavior: smooth; 
+  html {
+    scroll-behavior: smooth;
+    font-family: var(--font-sans);
   }
-  
-  /* Removed overflow-x: clip to enable sticky positioning */
+
   body {
     @apply bg-background text-ink antialiased;
     width: 100%;
-  }
-
-  *, ::before, ::after {
-    font-family: var(--font-sans) !important;
+    font-family: var(--font-sans);
   }
 }
 
@@ -40,5 +37,5 @@
 }
 
 .btn-pill {
-  @apply px-8 py-3 rounded-full font-bold uppercase tracking-widest text-[10px] transition-all duration-300 flex items-center gap-2;
+  @apply px-8 py-3.5 rounded-full font-bold transition-all duration-300 flex items-center gap-2;
 }

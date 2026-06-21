@@ -3,11 +3,10 @@ import { Link, useParams } from "react-router-dom";
 import ProductMain from "../components/product/ProductMain";
 import ProductTabs from "../components/product/ProductTabs";
 import ProductCollection from "../components/home/ProductCollection";
-import { Reveal } from "../components/shared/Reveal";
 import { getSingleProduct } from "../lib/woocommerce";
 
 export default function ProductDetail() {
-  const { id } = useParams(); 
+  const { id } = useParams();
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -47,7 +46,6 @@ export default function ProductDetail() {
   return (
     <main className="bg-[#FDF8F0] min-h-screen">
       <div className="max-w-7xl mx-auto px-6 md:px-12 py-12">
-        
         <div className="mb-10">
           <Link to="/store" className="inline-flex items-center gap-2 text-[11px] font-bold text-black/40 hover:text-[#FF6B35] transition-colors">
             ← Store / <span className="text-black">{product.name}</span>
@@ -57,15 +55,12 @@ export default function ProductDetail() {
         <ProductMain product={product} />
         <ProductTabs attributes={product.attributes || []} />
 
-        <div className="pt-24 border-t border-black/5">
-          <Reveal>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white/50 mb-6 w-fit mx-auto">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
-              <span className="font-mono text-[10px] text-black/60 font-bold uppercase tracking-widest">More products</span>
-            </div>
-            <h2 className="text-3xl md:text-5xl font-black text-black text-center mb-16 tracking-tight">Explore Our Frame Products</h2>
-          </Reveal>
-          <ProductCollection />
+        {/* Consolidated Related Products Section */}
+        <div className="mt-24 border-t border-black/5">
+          <ProductCollection 
+            badge="More products" 
+            variant="minimal" 
+          />
         </div>
       </div>
     </main>

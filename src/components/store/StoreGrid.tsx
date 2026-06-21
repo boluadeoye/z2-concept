@@ -1,9 +1,28 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingBag, Search, ChevronDown, ChevronRight } from "lucide-react";
+import { Search, ChevronDown } from "lucide-react";
 import { Reveal } from "../shared/Reveal";
 import { getWooProducts } from "../../lib/woocommerce";
 import { useCart } from "../../context/CartContext";
+
+// Custom Trapezoidal Basket Icon matching Figma Prototype
+const BasketIcon = ({ className = "w-4.5 h-4.5" }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2.5" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <path d="M4 10h16" />
+    <path d="M5 10l1.5 8.5A2 2 0 0 0 8.5 20h7a2 2 0 0 0 2-1.5L19 10" />
+    <path d="M9 10l3-6 3 6" />
+    <line x1="10" y1="14" x2="10" y2="16" />
+    <line x1="14" y1="14" x2="14" y2="16" />
+  </svg>
+);
 
 export default function StoreGrid() {
   const [products, setProducts] = useState([]);
@@ -19,7 +38,7 @@ export default function StoreGrid() {
   }, []);
 
   const filteredProducts = useMemo(() => {
-    return products.filter((p: any) => 
+    return products.filter((p: any) =>
       p.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [products, searchQuery]);
@@ -32,7 +51,9 @@ export default function StoreGrid() {
   return (
     <section className="py-24 md:py-32 px-6 md:px-12 bg-[#FDF8F0]">
       <div className="max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-12">
+        
+        {/* FILTER & SEARCH HEADER */}
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-16">
           <div className="relative w-full md:w-64">
             <select className="w-full bg-white border border-black/5 rounded-xl px-6 py-4 text-[11px] font-bold uppercase tracking-widest appearance-none outline-none">
               <option>Select All Categories</option>
@@ -51,25 +72,38 @@ export default function StoreGrid() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 md:gap-x-8 gap-y-12 mb-20">
-          {filteredProducts.map((p: any, i: number) => (
+        {/* 4-COLUMN GRID */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 md:gap-x-8 gap-y-16 mb-20">
+          {filteredProducts.map((p: any) => (
             <Reveal key={p.id}>
               <Link to={`/product/${p.id}`} className="group block">
-                <div className="relative aspect-square rounded-[24px] overflow-hidden mb-6 border border-black/5 shadow-sm bg-white">
-                  <img src={p.images?.[0]?.src} alt={p.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                {/* PRODUCT IMAGE: Strictly sharp corners (No rounded edges) */}
+                <div className="relative aspect-square rounded-none overflow-hidden mb-6 border border-black/5 shadow-sm bg-white">
+                  <img 
+                    src={p.images?.[0]?.src} 
+                    alt={p.name} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                  />
                 </div>
+                
+                {/* DETAILS CONTAINER */}
                 <div className="flex items-end justify-between px-1">
                   <div className="max-w-[70%]">
-                    <h3 className="text-[13px] font-bold text-black uppercase tracking-tight mb-1 truncate">{p.name}</h3>
-                    <p className="text-black/40 text-[11px] font-bold">₦{Number(p.price || 0).toLocaleString()}</p>
+                    {/* TITLE CASE FOR COHESIVE LOOK */}
+                    <h3 className="text-[14px] font-bold text-black tracking-tight mb-1 truncate">
+                      {p.name}
+                    </h3>
+                    <p className="text-black/40 text-xs font-bold">
+                      ₦{Number(p.price || 0).toLocaleString()}
+                    </p>
                   </div>
+                  
+                  {/* ADD TO CART BUTTON: White neutral state, Orange on group-hover only */}
                   <button 
                     onClick={(e) => handleAddToCart(e, p)}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center border transition-all ${
-                      i % 4 === 2 ? "bg-[#FF6B35] border-[#FF6B35] text-white shadow-lg scale-110" : "bg-white border-black/10 text-black hover:border-[#FF6B35]"
-                    }`}
+                    className="w-10 h-10 rounded-full flex items-center justify-center border border-black/10 bg-white text-black transition-all duration-300 group-hover:bg-[#FF6B35] group-hover:border-[#FF6B35] group-hover:text-white group-hover:shadow-lg"
                   >
-                    <ShoppingBag size={16} strokeWidth={2.5} />
+                    <BasketIcon />
                   </button>
                 </div>
               </Link>

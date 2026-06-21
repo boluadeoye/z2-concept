@@ -24,7 +24,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative h-[80vh] w-full flex items-center justify-center overflow-hidden bg-black pt-20">
+    <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black pt-20">
       {slides.map((slide, idx) => (
         <div key={idx} className={`absolute inset-0 transition-opacity duration-1000 ${idx === current ? "opacity-60" : "opacity-0"}`}>
           <img src={slide.image} alt="Hero" className="w-full h-full object-cover object-center" />
@@ -33,35 +33,61 @@ export default function Hero() {
       <div className="absolute inset-0 bg-black/40 z-0" />
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center text-white">
-        <h1 className="text-3xl md:text-6xl font-bold leading-tight mb-6 tracking-tight uppercase">
+        {/* 
+          DETERMINISTIC SAFE ZONE: 
+          - text-3xl on mobile prevents long words from breaking the container.
+          - max-w-[240px] ensures 60px of clear air on each side of a 360px screen.
+        */}
+        <h1 className="text-3xl md:text-6xl font-black leading-[1.15] mb-6 tracking-tight max-w-[240px] sm:max-w-3xl lg:max-w-4xl mx-auto antialiased">
           {slides[current].heading}
         </h1>
-        <p className="text-white/80 text-sm md:text-base max-w-xl mx-auto mb-10 font-medium">
+        
+        {/* DETERMINISTIC SAFE ZONE: max-w-[220px] prevents subtext collision with arrows */}
+        <p className="text-white/80 text-sm md:text-base max-w-[220px] sm:max-w-xl mx-auto mb-10 font-medium leading-relaxed">
           {slides[current].subtext}
         </p>
 
-        <div className="flex flex-row items-center justify-center gap-4">
-          <Link to="/contact" className="px-10 py-3.5 bg-black text-white rounded-lg font-bold text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition-all border border-white/20">
+        {/* CTA BUTTONS: Stacked on mobile, pill-shaped, Title Case */}
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-[260px] sm:max-w-none mx-auto">
+          <Link 
+            to="/contact" 
+            className="w-full sm:w-auto px-10 py-4 bg-black text-white rounded-full font-bold text-xs tracking-wider transition-all duration-300 border border-black hover:bg-[#FF6B35] hover:border-[#FF6B35] whitespace-nowrap text-center"
+          >
             Contact Us
           </Link>
-          <Link to="/portfolio" className="px-10 py-3.5 bg-transparent border border-white/40 text-white rounded-lg font-bold text-[10px] uppercase tracking-widest hover:bg-white/10 transition-all">
-            View Work
+          <Link 
+            to="/portfolio" 
+            className="w-full sm:w-auto px-10 py-4 bg-transparent border border-white/40 text-white rounded-full font-bold text-xs tracking-wider hover:bg-white hover:text-black transition-all whitespace-nowrap text-center"
+          >
+            View Our Work
           </Link>
         </div>
       </div>
 
-      <div className="absolute inset-x-4 md:inset-x-8 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none z-20">
-        <button onClick={() => setCurrent((prev) => (prev - 1 + slides.length) % slides.length)} className="w-10 h-10 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white pointer-events-auto hover:bg-white hover:text-black transition-all">
-          <ChevronLeft size={20} />
+      {/* 
+        NAVIGATION ARROWS: 
+        - Downscaled to w-10 on mobile.
+        - Pushed to inset-x-2 (8px) to maximize central safe zone.
+      */}
+      <div className="absolute inset-x-2 md:inset-x-8 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none z-20">
+        <button 
+          onClick={() => setCurrent((prev) => (prev - 1 + slides.length) % slides.length)} 
+          className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white pointer-events-auto hover:bg-[#FF6B35] hover:border-[#FF6B35] transition-all"
+        >
+          <ChevronLeft size={18} md:size={20} />
         </button>
-        <button onClick={() => setCurrent((prev) => (prev + 1) % slides.length)} className="w-10 h-10 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white pointer-events-auto hover:bg-white hover:text-black transition-all">
-          <ChevronRight size={20} />
+        <button 
+          onClick={() => setCurrent((prev) => (prev + 1) % slides.length)} 
+          className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white pointer-events-auto hover:bg-[#FF6B35] hover:border-[#FF6B35] transition-all"
+        >
+          <ChevronRight size={18} md:size={20} />
         </button>
       </div>
 
+      {/* Slide Indicators */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-20">
         {slides.map((_, idx) => (
-          <div key={idx} className={`h-1 rounded-full transition-all duration-300 ${idx === current ? "w-8 bg-accent" : "w-2 bg-white/30"}`} />
+          <div key={idx} className={`h-1.5 rounded-full transition-all duration-300 ${idx === current ? "w-8 bg-[#FF6B35]" : "w-2 bg-white/30"}`} />
         ))}
       </div>
     </section>
