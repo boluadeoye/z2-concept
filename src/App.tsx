@@ -5,6 +5,7 @@ import Footer from './components/layout/Footer';
 import Hero from './components/home/Hero';
 import IntroStatement from './components/home/IntroStatement';
 import AboutSplit from './components/home/AboutSplit';
+import ServicesOverview from './components/home/ServicesOverview';
 import PortfolioSlider from './components/home/PortfolioSlider';
 import BrandMarquee from './components/home/BrandMarquee';
 import ProductCollection from './components/home/ProductCollection';
@@ -39,6 +40,7 @@ const Home = () => (
     <Hero />
     <IntroStatement />
     <AboutSplit />
+    <ServicesOverview />
     <PortfolioSlider />
     <BrandMarquee />
     <ProductCollection />

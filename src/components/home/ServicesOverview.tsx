@@ -1,50 +1,52 @@
 import React from "react";
-import { Camera, Video, Monitor, PenTool, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
+import { Reveal } from "../shared/Reveal";
 
-const categories = [
-  { icon: <Camera size={20} />, title: "Photography", list: ["Studio Portraiture", "Editorial Captures"] },
-  { icon: <Video size={20} />, title: "Video Production", list: ["Event Coverage", "Commercial Direction"] },
-  { icon: <Monitor size={20} />, title: "Website Development", list: ["Headless Commerce", "Portfolio Hubs"] },
-  { icon: <PenTool size={20} />, title: "Graphic Design", list: ["Identity Guidelines", "Brand Packages"] }
+const services = [
+  { title: "Photography", img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782138508/blog_assets/xgx29asy5mvyi9tnpner.jpg" },
+  { title: "Video Production", img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137278/blog_assets/uftpsbjdtjezhshfwu9y.jpg" },
+  { title: "Website Development", img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782138122/blog_assets/imueq9xlwj0n9oxlz6ay.jpg" },
+  { title: "Graphic Design", img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782138681/blog_assets/lms2u2ymh5c0o3qc6efb.jpg" }
 ];
 
 export default function ServicesOverview() {
   return (
-    <section className="py-24 md:py-32 px-6 md:px-12 bg-white">
+    <section className="py-24 md:py-32 px-6 md:px-12 bg-[#FDF8F0]">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-20">
-          <span className="font-mono text-[10px] text-[#8B7E3D] tracking-[0.2em] uppercase mb-4 inline-block">What We Offer</span>
-          <h2 className="text-3xl md:text-5xl font-bold text-black uppercase">Our Services</h2>
+          <Reveal>
+            <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white/50 mb-6 w-fit mx-auto">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
+              <span className="font-mono text-[10px] text-black/60 font-bold uppercase tracking-widest">What We Offer</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-black text-black tracking-tight">Our Services</h2>
+          </Reveal>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 mb-16">
-          <div className="relative aspect-video rounded-3xl overflow-hidden group shadow-xl">
-            <img src="https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521115/blog_assets/ytxsfz4o5w7brat1zx4q.png" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-            <div className="absolute bottom-8 left-8 right-8 text-white flex justify-between items-end">
-              <h3 className="text-2xl font-bold uppercase">Photography</h3>
-              <div className="w-10 h-10 rounded-full bg-[#F4A261] flex items-center justify-center"><ArrowUpRight size={18} /></div>
-            </div>
-          </div>
-          <div className="relative aspect-video rounded-3xl overflow-hidden group shadow-xl">
-            <img src="https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521121/blog_assets/hbgy9tg3xwufbzemj3v0.png" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-            <div className="absolute bottom-8 left-8 right-8 text-white flex justify-between items-end">
-              <h3 className="text-2xl font-bold uppercase">Web Systems</h3>
-              <div className="w-10 h-10 rounded-full bg-[#F4A261] flex items-center justify-center"><ArrowUpRight size={18} /></div>
-            </div>
-          </div>
-        </div>
-
-        <div className="grid md:grid-cols-4 gap-6">
-          {categories.map((s, i) => (
-            <div key={i} className="bg-[#FDF8F0]/50 border border-black/5 p-8 rounded-2xl hover:border-[#8B7E3D] transition-all">
-              <div className="text-[#8B7E3D] mb-6">{s.icon}</div>
-              <h4 className="text-sm font-bold uppercase mb-4">{s.title}</h4>
-              <ul className="space-y-2 border-t border-black/5 pt-4">
-                {s.list.map(item => <li key={item} className="text-black/60 text-[11px] flex items-center gap-2">✓ {item}</li>)}
-              </ul>
-            </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 md:gap-x-8 gap-y-16">
+          {services.map((s, i) => (
+            <Reveal key={i}>
+              <div className="group cursor-pointer">
+                {/* IMAGE CONTAINER: Rounded as per prototype */}
+                <div className="relative aspect-[4/5] rounded-[32px] overflow-hidden mb-6 border border-black/5 shadow-sm bg-white">
+                  <img 
+                    src={s.img} 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                    alt={s.title} 
+                  />
+                </div>
+                
+                {/* TITLE & NAV TRIGGER: No Cart Icon */}
+                <div className="flex items-center justify-between px-1">
+                  <h3 className="text-[15px] md:text-[17px] font-bold text-black tracking-tight leading-tight">
+                    {s.title}
+                  </h3>
+                  <div className="w-8 h-8 rounded-full bg-[#F2E3D5] text-black flex items-center justify-center transition-all duration-300 group-hover:bg-[#FF6B35] group-hover:text-white">
+                    <ArrowUpRight size={16} strokeWidth={3} className="rotate-45" />
+                  </div>
+                </div>
+              </div>
+            </Reveal>
           ))}
         </div>
       </div>

@@ -21,12 +21,19 @@ export default function ProductCollection({
   badge = "Our Collections", 
   variant = "default" 
 }: ProductCollectionProps) {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadData() {
+      setLoading(true);
+      // RESTORED: Dynamic WooCommerce fetch query
       const data = await getWooProducts("frame-products");
-      if (data && data.length > 0) setProducts(data);
+      if (data && data.length > 0) {
+        // ENFORCED: Limit rendering strictly to first 8 products in your database
+        setProducts(data.slice(0, 8));
+      }
+      setLoading(false);
     }
     loadData();
   }, []);
@@ -56,27 +63,33 @@ export default function ProductCollection({
           )}
         </Reveal>
 
-        {/* GRID: Sharp Edges & Correct Mobile Gutter */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 md:gap-x-8 gap-y-12 mb-20 text-left">
-          {products.map((p: any) => (
-            <Reveal key={p.id}>
-              <Link to={`/product/${p.id}`} className="group block">
-                <div className="relative aspect-square rounded-none overflow-hidden mb-5 border border-black/5 shadow-sm bg-white">
-                  <img src={p.images?.[0]?.src} alt={p.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                </div>
-                <div className="flex items-end justify-between px-1">
-                  <div className="max-w-[70%]">
-                    <h3 className="text-[13px] md:text-[14px] font-bold text-black tracking-tight mb-1 truncate">{p.name}</h3>
-                    <p className="text-black/40 text-[10px] md:text-xs font-bold">₦{Number(p.price || 0).toLocaleString()}</p>
+        {loading ? (
+          <div className="min-h-[300px] flex items-center justify-center">
+            <span className="text-xs font-bold text-black/20 uppercase tracking-widest animate-pulse">Syncing Live WordPress Catalog...</span>
+          </div>
+        ) : (
+          /* GRID: Sharp Edges & Correct Mobile Gutter (8 Items Max) */
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 md:gap-x-8 gap-y-12 mb-20 text-left">
+            {products.map((p: any) => (
+              <Reveal key={p.id}>
+                <Link to={`/product/${p.id}`} className="group block">
+                  <div className="relative aspect-square rounded-none overflow-hidden mb-5 border border-black/5 shadow-sm bg-white">
+                    <img src={p.images?.[0]?.src} alt={p.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                   </div>
-                  <div className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center border border-black/10 bg-white text-black transition-all duration-300 group-hover:bg-[#FF6B35] group-hover:border-[#FF6B35] group-hover:text-white group-hover:shadow-lg">
-                    <BasketIcon className="w-4 h-4 md:w-4.5 md:h-4.5" />
+                  <div className="flex items-end justify-between px-1">
+                    <div className="max-w-[70%]">
+                      <h3 className="text-[13px] md:text-[14px] font-bold text-black tracking-tight mb-1 truncate">{p.name}</h3>
+                      <p className="text-black/40 text-[10px] md:text-xs font-bold">₦{Number(p.price || 0).toLocaleString()}</p>
+                    </div>
+                    <div className="w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center border border-black/10 bg-white text-black transition-all duration-300 group-hover:bg-[#FF6B35] group-hover:border-[#FF6B35] group-hover:text-white group-hover:shadow-lg">
+                      <BasketIcon className="w-4 h-4 md:w-4.5 md:h-4.5" />
+                    </div>
                   </div>
-                </div>
-              </Link>
-            </Reveal>
-          ))}
-        </div>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+        )}
 
         {!isMinimal && (
           <Reveal>

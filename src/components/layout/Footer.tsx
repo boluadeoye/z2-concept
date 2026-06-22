@@ -5,14 +5,14 @@ import { Mail, Phone, MapPin } from "lucide-react";
 export default function Footer() {
   return (
     <footer className="relative bg-[#0C0608] text-white py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* BACKGROUND LAYER: Photographic Depth */}
+      {/* BACKGROUND LAYER: Calibrated Editorial Texture */}
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521104/blog_assets/uhkj4l7sck5mdfvfbrpq.png" 
+          src="https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137329/blog_assets/vubakrtom9syeaeravih.jpg" 
           alt="Footer Background" 
-          className="w-full h-full object-cover opacity-25"
+          className="w-full h-full object-cover object-center opacity-100"
         />
-        <div className="absolute inset-0 bg-black/90" />
+        <div className="absolute inset-0 bg-black/80" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
@@ -61,22 +61,22 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* CONTACT US: Gold Icons + Compact Address Wrap */}
+            {/* CONTACT US: Ireland HQ Data */}
             <div className="col-span-2 md:col-span-1 min-w-0 md:min-w-[240px]">
               <h4 className="text-[#FF6B35] font-bold text-[15px] mb-6 md:mb-10">Contact Us</h4>
               <ul className="space-y-5 text-[14px] text-white/70 font-medium">
                 <li className="flex items-center gap-4">
                   <Mail size={18} className="text-[#8B7E3D] shrink-0" />
-                  <span className="truncate">Phelzink@gmail.com</span>
+                  <span className="truncate">info@z2concepts.com</span>
                 </li>
                 <li className="flex items-center gap-4">
                   <Phone size={18} className="text-[#8B7E3D] shrink-0" />
-                  <span>+234 812 582 1771</span>
+                  <span>+1 224 900 0540</span>
                 </li>
                 <li className="flex items-start gap-4">
                   <MapPin size={18} className="text-[#8B7E3D] mt-1 shrink-0" />
-                  <span className="leading-relaxed max-w-[20ch]">
-                    24, Oguntolu Street, Shomolu, Lagos
+                  <span className="leading-relaxed max-w-[24ch]">
+                    27 Abhainn Glas Edgeworthstown, Longford N39 TV09, Ireland
                   </span>
                 </li>
               </ul>

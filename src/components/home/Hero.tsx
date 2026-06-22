@@ -4,14 +4,22 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const slides = [
   {
-    image: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521102/blog_assets/skw6qc5r8hu7ajzgmuxh.png",
-    heading: "Transform Your Brand with Creative Design & Print Solutions",
-    subtext: "Exceptional branding, innovative design, and high-quality printing services."
+    image: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137095/blog_assets/whpzsruxbwmmb7ckwuiq.jpg",
+    heading: "From media production to digital experiences",
+    subtext: "We combine creativity with tech to deliver visual excellence",
+    ctaPrimary: "View Our Works",
+    ctaSecondary: "Contact Us",
+    linkPrimary: "/portfolio",
+    linkSecondary: "/contact"
   },
   {
-    image: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521130/blog_assets/dsitt1fhtiod9dkndedz.png",
-    heading: "Handcrafted Frames & High-End Gallery Printing",
-    subtext: "Elevate your visual memories into physical works of art."
+    image: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137095/blog_assets/whpzsruxbwmmb7ckwuiq.jpg",
+    heading: "Create. Captivate. Convert",
+    subtext: "Professional photography, video production, web design, branding, and AI-powered content solutions tailored for you",
+    ctaPrimary: "View Our Works",
+    ctaSecondary: "Get Started",
+    linkPrimary: "/portfolio",
+    linkSecondary: "/register"
   }
 ];
 
@@ -33,54 +41,46 @@ export default function Hero() {
       <div className="absolute inset-0 bg-black/40 z-0" />
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center text-white">
-        {/* 
-          DETERMINISTIC SAFE ZONE: 
-          - text-3xl on mobile prevents long words from breaking the container.
-          - max-w-[240px] ensures 60px of clear air on each side of a 360px screen.
-        */}
+        {/* Figma Fidelity: Strict max-width on H1 to prevent chevron collision on all viewports */}
         <h1 className="text-3xl md:text-6xl font-black leading-[1.15] mb-6 tracking-tight max-w-[240px] sm:max-w-3xl lg:max-w-4xl mx-auto antialiased">
           {slides[current].heading}
         </h1>
         
-        {/* DETERMINISTIC SAFE ZONE: max-w-[220px] prevents subtext collision with arrows */}
+        {/* Figma Fidelity: Tightened max-width on P to ensure subtext stays in the "Safe Zone" between arrows on mobile */}
         <p className="text-white/80 text-sm md:text-base max-w-[220px] sm:max-w-xl mx-auto mb-10 font-medium leading-relaxed">
           {slides[current].subtext}
         </p>
 
-        {/* CTA BUTTONS: Stacked on mobile, pill-shaped, Title Case */}
+        {/* Figma Fidelity: Responsive Stack with white-space lock and compact mobile max-width */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-[260px] sm:max-w-none mx-auto">
           <Link 
-            to="/contact" 
-            className="w-full sm:w-auto px-10 py-4 bg-black text-white rounded-full font-bold text-xs tracking-wider transition-all duration-300 border border-black hover:bg-[#FF6B35] hover:border-[#FF6B35] whitespace-nowrap text-center"
+            to={slides[current].linkPrimary} 
+            className="w-full sm:w-auto px-10 py-4 bg-[#FF6B35] text-white rounded-full font-bold text-xs tracking-wider transition-all duration-300 border border-[#FF6B35] hover:bg-black hover:border-black whitespace-nowrap text-center"
           >
-            Contact Us
+            {slides[current].ctaPrimary}
           </Link>
           <Link 
-            to="/portfolio" 
+            to={slides[current].linkSecondary} 
             className="w-full sm:w-auto px-10 py-4 bg-transparent border border-white/40 text-white rounded-full font-bold text-xs tracking-wider hover:bg-white hover:text-black transition-all whitespace-nowrap text-center"
           >
-            View Our Work
+            {slides[current].ctaSecondary}
           </Link>
         </div>
       </div>
 
-      {/* 
-        NAVIGATION ARROWS: 
-        - Downscaled to w-10 on mobile.
-        - Pushed to inset-x-2 (8px) to maximize central safe zone.
-      */}
+      {/* Navigation Arrows: Absolutely positioned at edges */}
       <div className="absolute inset-x-2 md:inset-x-8 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none z-20">
         <button 
           onClick={() => setCurrent((prev) => (prev - 1 + slides.length) % slides.length)} 
-          className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white pointer-events-auto hover:bg-[#FF6B35] hover:border-[#FF6B35] transition-all"
+          className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white pointer-events-auto hover:bg-[#FF6B35] transition-all"
         >
-          <ChevronLeft size={18} md:size={20} />
+          <ChevronLeft size={18} />
         </button>
         <button 
           onClick={() => setCurrent((prev) => (prev + 1) % slides.length)} 
-          className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white pointer-events-auto hover:bg-[#FF6B35] hover:border-[#FF6B35] transition-all"
+          className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white pointer-events-auto hover:bg-[#FF6B35] transition-all"
         >
-          <ChevronRight size={18} md:size={20} />
+          <ChevronRight size={18} />
         </button>
       </div>
 
