@@ -6,26 +6,26 @@ interface AuthLayoutProps {
   image?: string;
 }
 
-export default function AuthLayout({ 
-  children, 
-  image = "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521104/blog_assets/uhkj4l7sck5mdfvfbrpq.png" 
+export default function AuthLayout({
+  children,
+  image = "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137995/blog_assets/qsgt9yfrytzydaomtuwd.jpg"
 }: AuthLayoutProps) {
   return (
     <main className="relative min-h-screen w-full flex items-center justify-center py-20 px-6 md:px-12 overflow-hidden">
       
-      {/* FULL PAGE BACKGROUND: The Wedding Car */}
+      {/* FULL PAGE BACKGROUND: The Wedding Car Scrim */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src="https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521102/blog_assets/skw6qc5r8hu7ajzgmuxh.png" 
+        <img
+          src="https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137095/blog_assets/whpzsruxbwmmb7ckwuiq.jpg"
           className="w-full h-full object-cover"
           alt=""
         />
-        <div className="absolute inset-0 bg-[#FDF8F0]/85" />
+        <div className="absolute inset-0 bg-[#FDF8F0]/90 backdrop-blur-[2px]" />
       </div>
 
       <div className="relative z-10 max-w-7xl w-full mx-auto">
-        {/* TWO SEPARATE PILLARS WITH FIGMA GAP */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-stretch">
+        {/* ASYMMETRIC PILLAR GRID: 1fr : 380px */}
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_380px] gap-12 items-stretch">
           
           {/* PILLAR 1: The Form Card */}
           <div className="flex flex-col h-full">
@@ -36,13 +36,13 @@ export default function AuthLayout({
             </Reveal>
           </div>
 
-          {/* PILLAR 2: The Separate Image Card (Pavilion Couple) */}
+          {/* PILLAR 2: The Stretched Image Card (Pavilion Couple) */}
           <div className="hidden md:block h-full">
             <Reveal className="h-full">
-              <div className="relative h-full w-full rounded-[48px] overflow-hidden shadow-2xl border border-black/5">
-                <img 
-                  src={image} 
-                  className="absolute inset-0 w-full h-full object-cover"
+              <div className="relative h-full w-full rounded-[48px] overflow-hidden shadow-2xl border border-black/5 bg-white">
+                <img
+                  src={image}
+                  className="absolute inset-0 w-full h-full object-cover object-[center_15%] antialiased"
                   alt="Authentication Visual"
                 />
               </div>

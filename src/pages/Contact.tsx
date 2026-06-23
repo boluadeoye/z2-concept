@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ArrowUpRight, Send, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, AlertCircle } from "lucide-react";
 import { PageHero } from "../components/shared/PageHero";
 import { ServiceTicker } from "../components/shared/ServiceTicker";
 import { Reveal } from "../components/shared/Reveal";
@@ -16,9 +16,7 @@ export default function ContactPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("loading");
-    
     const result = await submitInquiry(formData.name, formData.email, formData.message);
-    
     if (result.success) {
       setStatus("success");
       setFormData({ name: "", email: "", message: "" });
@@ -29,11 +27,13 @@ export default function ContactPage() {
 
   return (
     <main className="bg-[#FDF8F0] min-h-screen">
+      {/* FIGMA FIDELITY: Cinematic Entry Header with Title Case Enforcement */}
       <PageHero 
-        title="Contact" 
+        title="Contact Us" 
         breadcrumb="Contact" 
-        image="https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521102/blog_assets/skw6qc5r8hu7ajzgmuxh.png" 
+        image="https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137095/blog_assets/whpzsruxbwmmb7ckwuiq.jpg" 
       />
+      
       <ServiceTicker />
 
       <section className="py-24 md:py-32 px-6">
@@ -43,7 +43,6 @@ export default function ContactPage() {
               <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
               <span className="font-mono text-[10px] text-black/60 font-bold uppercase tracking-widest">Get In Touch</span>
             </div>
-
             <h2 className="text-4xl md:text-7xl font-black text-black tracking-tighter mb-16 leading-[1.1]">
               Hello! How can we be of <br /> help to you today?
             </h2>
@@ -56,22 +55,22 @@ export default function ContactPage() {
                   <label className="text-[11px] font-black uppercase tracking-widest text-black/40 ml-2">Name</label>
                   <input 
                     type="text" 
-                    required
+                    required 
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     className="w-full bg-white border border-black/5 rounded-[24px] px-8 py-5 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all shadow-sm" 
-                    placeholder="Your name"
+                    placeholder="Your name" 
                   />
                 </div>
                 <div className="space-y-3">
                   <label className="text-[11px] font-black uppercase tracking-widest text-black/40 ml-2">Email</label>
                   <input 
                     type="email" 
-                    required
+                    required 
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                     className="w-full bg-white border border-black/5 rounded-[24px] px-8 py-5 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all shadow-sm" 
-                    placeholder="Enter email"
+                    placeholder="Enter email" 
                   />
                 </div>
               </div>
@@ -80,17 +79,17 @@ export default function ContactPage() {
                 <label className="text-[11px] font-black uppercase tracking-widest text-black/40 ml-2">Talk to us</label>
                 <textarea 
                   rows={6} 
-                  required
+                  required 
                   value={formData.message}
                   onChange={(e) => setFormData({...formData, message: e.target.value})}
                   className="w-full bg-white border border-black/5 rounded-[32px] px-8 py-6 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all shadow-sm resize-none" 
-                  placeholder="How can we help?"
+                  placeholder="How can we help?" 
                 />
               </div>
 
               <div className="flex flex-col items-center gap-6">
                 <button 
-                  type="submit"
+                  type="submit" 
                   disabled={status === "loading"}
                   className="w-full md:w-fit bg-[#FF6B35] text-white font-black text-[12px] uppercase tracking-[0.2em] px-16 py-6 rounded-2xl flex items-center justify-center gap-3 hover:bg-black transition-all shadow-2xl shadow-[#FF6B35]/30 disabled:opacity-50"
                 >

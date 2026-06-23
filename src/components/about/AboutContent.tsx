@@ -4,19 +4,40 @@ import { Reveal } from "../shared/Reveal";
 
 export default function AboutContent() {
   const [activeTab, setActiveTab] = useState("company");
-  const text = "specialises in professional photography and video production, delivering high-quality visuals across a wide range of projects. From weddings and events to fashion, corporate content, and branded media.";
+
+  const content = {
+    company: {
+      heading: "From Media Production to Digital Experiences",
+      paragraphs: [
+        "At our company, we excel in transforming ideas into stunning realities through a diverse range of media production services. Our expertise spans professional photography, video production, web design, branding, and AI-powered content creation. We are dedicated to delivering exceptional visuals that resonate across a myriad of projects, including weddings, corporate events, fashion shoots, and branded media campaigns.",
+        "What truly distinguishes us in the industry is our unique ability to infuse creativity and innovation into every phase of the production process. We believe that every project should be a reflection of our clients' individuality and core values, which is why we adopt a highly collaborative approach. By actively engaging with our clients, we ensure that their vision is at the heart of what we create.",
+        "Whether it’s capturing the emotions of a wedding, showcasing a brand’s identity through tailored media, or developing a compelling online presence, we strive to exceed expectations and deliver results that truly stand out."
+      ],
+      cta: "Download Profile"
+    },
+    founder: {
+      heading: "Eric is the Founder and CEO of Kefee Home Productions and its Creative Division, Z2 Concepts",
+      paragraphs: [
+        "His commitment is to providing a holistic visual experience that not only meets the demands of modern standards but also maintains a personal touch that makes each project memorable and impactful."
+      ],
+      cta: "Download Profile"
+    }
+  };
+
+  const activeData = activeTab === "company" ? content.company : content.founder;
+  const imageAsset = "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137995/blog_assets/qsgt9yfrytzydaomtuwd.jpg";
 
   return (
     <section className="py-20 md:py-32 px-6 md:px-12 bg-[#FDF8F0]">
       <div className="max-w-7xl mx-auto">
-        {/* items-stretch is the master lock for equal height */}
         <div className="grid grid-cols-1 md:grid-cols-[1fr_380px] gap-10 lg:gap-12 items-stretch">
           
           {/* LEFT: The Narrative Card */}
-          <div className="flex flex-col">
+          <div className="flex flex-col h-full">
             <Reveal className="h-full">
               <div className="bg-white rounded-[48px] p-10 lg:p-16 shadow-[0_30px_80px_-15px_rgba(0,0,0,0.05)] border border-black/5 flex flex-col h-full">
-                {/* Tabs */}
+                
+                {/* Standardized Badge Navigation */}
                 <div className="flex gap-4 mb-12">
                   <button 
                     onClick={() => setActiveTab("company")}
@@ -25,7 +46,7 @@ export default function AboutContent() {
                     }`}
                   >
                     <div className={`w-1.5 h-1.5 rounded-full ${activeTab === "company" ? "bg-[#FF6B35]" : "bg-black/20"}`} />
-                    About Company
+                    About Us
                   </button>
                   <button 
                     onClick={() => setActiveTab("founder")}
@@ -38,45 +59,45 @@ export default function AboutContent() {
                   </button>
                 </div>
 
-                <h2 className="text-3xl lg:text-5xl font-black text-black mb-10 leading-tight uppercase tracking-tight">
-                  Kefee Home Productions and its creative division, Z2 Concepts
+                <h2 className="text-3xl lg:text-5xl font-black text-black mb-10 leading-tight tracking-tight">
+                  {activeData.heading}
                 </h2>
 
-                <div className="space-y-8 text-black/70 text-sm lg:text-base leading-relaxed mb-12 flex-1">
-                  <p>{text}</p>
-                  <p>{text}{text}</p>
-                  <p>{text}</p>
+                <div className="space-y-6 text-black/70 text-sm lg:text-base leading-relaxed mb-12 flex-1">
+                  {activeData.paragraphs.map((p, i) => (
+                    <p key={i}>{p}</p>
+                  ))}
                 </div>
 
                 <div className="mt-auto">
                   <button className="flex items-center gap-3 bg-white border border-black/10 text-black rounded-full px-10 py-4 text-[11px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all group shadow-md">
-                    DOWNLOAD PROFILE <ArrowUpRight size={16} strokeWidth={3} className="text-[#FF6B35] group-hover:text-white" />
+                    {activeData.cta} <ArrowUpRight size={16} strokeWidth={3} className="text-[#FF6B35] group-hover:text-white" />
                   </button>
                 </div>
               </div>
             </Reveal>
           </div>
 
-          {/* RIGHT: The Anchored Visual Pillar (FORCED STRETCH) */}
-          <div className="hidden md:block">
+          {/* RIGHT: The Visual Pillar - Corrected Focal Point to prevent "Cut" subjects */}
+          <div className="hidden md:block h-full">
             <Reveal className="h-full">
               <div className="relative h-full w-full rounded-[48px] overflow-hidden shadow-2xl border border-black/5">
                 <img 
-                  src="https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521104/blog_assets/uhkj4l7sck5mdfvfbrpq.png" 
-                  alt="About Z2"
-                  className="absolute inset-0 w-full h-full object-cover"
+                  src={imageAsset} 
+                  alt="Z2 Concept Visual"
+                  className="absolute inset-0 w-full h-full object-cover object-[center_15%] antialiased"
                 />
               </div>
             </Reveal>
           </div>
 
-          {/* Mobile Image */}
+          {/* Mobile Image: Corrected Focal Point */}
           <div className="md:hidden w-full mt-8">
             <div className="relative aspect-[3/4] rounded-[32px] overflow-hidden shadow-xl">
               <img 
-                src="https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521104/blog_assets/uhkj4l7sck5mdfvfbrpq.png" 
-                alt="About Z2"
-                className="w-full h-full object-cover"
+                src={imageAsset} 
+                alt="Z2 Concept Visual"
+                className="w-full h-full object-cover object-[center_15%]"
               />
             </div>
           </div>
