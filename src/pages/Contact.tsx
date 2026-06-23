@@ -1,12 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { ArrowUpRight, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, AlertCircle, Send } from "lucide-react";
 import { PageHero } from "../components/shared/PageHero";
 import { ServiceTicker } from "../components/shared/ServiceTicker";
 import { Reveal } from "../components/shared/Reveal";
 import { submitInquiry } from "../lib/woocommerce";
 
+const services = [
+  "Photography",
+  "Video Production",
+  "Website Development",
+  "Graphic Design",
+  "AI Content Creation",
+  "Social Media Content",
+  "Creative Consulting"
+];
+
 export default function ContactPage() {
-  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [formData, setFormData] = useState({ name: "", email: "", phone: "", service: "", message: "" });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   useEffect(() => {
@@ -19,7 +29,7 @@ export default function ContactPage() {
     const result = await submitInquiry(formData.name, formData.email, formData.message);
     if (result.success) {
       setStatus("success");
-      setFormData({ name: "", email: "", message: "" });
+      setFormData({ name: "", email: "", phone: "", service: "", message: "" });
     } else {
       setStatus("error");
     }
@@ -27,7 +37,6 @@ export default function ContactPage() {
 
   return (
     <main className="bg-[#FDF8F0] min-h-screen">
-      {/* FIGMA FIDELITY: Cinematic Entry Header with Title Case Enforcement */}
       <PageHero 
         title="Contact Us" 
         breadcrumb="Contact" 
@@ -49,13 +58,12 @@ export default function ContactPage() {
           </Reveal>
 
           <Reveal>
-            <form onSubmit={handleSubmit} className="space-y-12 text-left">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            <form onSubmit={handleSubmit} className="space-y-10 text-left">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-3">
                   <label className="text-[11px] font-black uppercase tracking-widest text-black/40 ml-2">Name</label>
                   <input 
-                    type="text" 
-                    required 
+                    type="text" required 
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                     className="w-full bg-white border border-black/5 rounded-[24px] px-8 py-5 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all shadow-sm" 
@@ -65,8 +73,7 @@ export default function ContactPage() {
                 <div className="space-y-3">
                   <label className="text-[11px] font-black uppercase tracking-widest text-black/40 ml-2">Email</label>
                   <input 
-                    type="email" 
-                    required 
+                    type="email" required 
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                     className="w-full bg-white border border-black/5 rounded-[24px] px-8 py-5 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all shadow-sm" 
@@ -75,11 +82,39 @@ export default function ContactPage() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black uppercase tracking-widest text-black/40 ml-2">Phone</label>
+                  <input 
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    className="w-full bg-white border border-black/5 rounded-[24px] px-8 py-5 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all shadow-sm" 
+                    placeholder="Enter phone" 
+                  />
+                </div>
+                <div className="space-y-3">
+                  <label className="text-[11px] font-black uppercase tracking-widest text-black/40 ml-2">Select Service</label>
+                  <div className="relative">
+                    <select 
+                      value={formData.service}
+                      onChange={(e) => setFormData({...formData, service: e.target.value})}
+                      className="w-full bg-white border border-black/5 rounded-[24px] px-8 py-5 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all shadow-sm appearance-none"
+                    >
+                      <option value="">Select a service</option>
+                      {services.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                    <div className="absolute right-8 top-1/2 -translate-y-1/2 pointer-events-none text-black/20">
+                      <Send size={14} className="rotate-90" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-3">
                 <label className="text-[11px] font-black uppercase tracking-widest text-black/40 ml-2">Talk to us</label>
                 <textarea 
-                  rows={6} 
-                  required 
+                  rows={6} required 
                   value={formData.message}
                   onChange={(e) => setFormData({...formData, message: e.target.value})}
                   className="w-full bg-white border border-black/5 rounded-[32px] px-8 py-6 text-sm font-bold outline-none focus:border-[#FF6B35] transition-all shadow-sm resize-none" 
@@ -89,11 +124,10 @@ export default function ContactPage() {
 
               <div className="flex flex-col items-center gap-6">
                 <button 
-                  type="submit" 
-                  disabled={status === "loading"}
-                  className="w-full md:w-fit bg-[#FF6B35] text-white font-black text-[12px] uppercase tracking-[0.2em] px-16 py-6 rounded-2xl flex items-center justify-center gap-3 hover:bg-black transition-all shadow-2xl shadow-[#FF6B35]/30 disabled:opacity-50"
+                  type="submit" disabled={status === "loading"}
+                  className="w-full md:w-fit bg-[#FF6B35] text-white font-black text-[11px] tracking-[0.15em] px-16 py-4 rounded-full flex items-center justify-center gap-3 hover:bg-black transition-all shadow-2xl shadow-[#FF6B35]/30 disabled:opacity-50"
                 >
-                  {status === "loading" ? "SENDING..." : "SEND INQUIRY"} <ArrowUpRight size={18} strokeWidth={3} />
+                  {status === "loading" ? "Sending..." : "Send Inquiry"} <ArrowUpRight size={18} strokeWidth={3} />
                 </button>
 
                 {status === "success" && (
