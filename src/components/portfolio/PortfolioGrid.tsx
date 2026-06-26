@@ -4,15 +4,19 @@ import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "../shared/Reveal";
 import { getWPPortfolios } from "../../lib/woocommerce";
 
-const WP_BASE_URL = "https://sleigh.staymedia.ng";
+const PROXY_PATH = "/wp-api";
+const WP_DOMAIN = "https://sleigh.staymedia.ng";
 
 const normalizeUrl = (url: string): string => {
   if (!url) return "";
-  // Remove escaped backslashes and quotes often found in WP JSON
   let clean = url.replace(/\\/g, "").replace(/"/g, "");
+  // Convert absolute WP links to proxied relative links
+  if (clean.startsWith(WP_DOMAIN)) {
+    return clean.replace(WP_DOMAIN, PROXY_PATH);
+  }
   if (clean.startsWith("http")) return clean;
   const path = clean.startsWith("/") ? clean : `/${clean}`;
-  return `${WP_BASE_URL}${path}`;
+  return `${PROXY_PATH}${path}`;
 };
 
 const extractFirstImage = (html: string): string | null => {
@@ -35,12 +39,11 @@ export default function PortfolioGrid() {
           const mapped = data.map((item: any, i: number) => {
             const featuredImg = item._embedded?.['wp:featuredmedia']?.[0]?.source_url;
             const contentImg = extractFirstImage(item.content?.rendered || item.excerpt?.rendered);
-            
             return {
               slug: item.slug,
               title: item.title?.rendered,
               active: i === 1, 
-              img: normalizeUrl(featuredImg) || contentImg, _debug: console.log("DEBUG_GRID_IMG:", { featuredImg, contentImg })
+              img: normalizeUrl(featuredImg) || contentImg
             };
           });
           setProjects(mapped);
@@ -84,8 +87,8 @@ export default function PortfolioGrid() {
                     <img 
                       src={project.img} 
                       alt={project.title} 
+                      referrerPolicy="no-referrer"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                      onError={(e) => (e.currentTarget.style.display = 'none')}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-black/5 text-black/10 font-black text-4xl">Z2</div>

@@ -6,18 +6,26 @@ import RelatedProjects from "../components/portfolio/RelatedProjects";
 import { Reveal } from "../components/shared/Reveal";
 import { getSingleWPPortfolio } from "../lib/woocommerce";
 
-const WP_BASE_URL = "https://sleigh.staymedia.ng";
+const PROXY_PATH = "/wp-api";
+const WP_DOMAIN = "https://sleigh.staymedia.ng";
 
 const normalizeUrl = (url: string): string => {
   if (!url) return "";
   let clean = url.replace(/\\/g, "").replace(/"/g, "");
+  if (clean.startsWith(WP_DOMAIN)) {
+    return clean.replace(WP_DOMAIN, PROXY_PATH);
+  }
   if (clean.startsWith("http")) return clean;
-  return `${WP_BASE_URL}${clean.startsWith("/") ? clean : "/" + clean}`;
+  const path = clean.startsWith("/") ? clean : `/${clean}`;
+  return `${PROXY_PATH}${path}`;
 };
 
 const fixRelativeContent = (html: string): string => {
   if (!html) return "";
-  return html.replace(/(src|href)=["']\/([^"']+)["']/g, `$1="${WP_BASE_URL}/$2"`);
+  // Fix both relative and absolute WP links in HTML
+  return html
+    .replace(/(src|href)=["']\/([^"']+)["']/g, `$1="${PROXY_PATH}/$2"`)
+    .replace(new RegExp(`(src|href)=["']${WP_DOMAIN}([^"']+)["']`, 'g'), `$1="${PROXY_PATH}$2"`);
 };
 
 const extractAllImages = (html: string): string[] => {
@@ -26,7 +34,7 @@ const extractAllImages = (html: string): string[] => {
   const images: string[] = [];
   let match;
   while ((match = imgRegex.exec(html)) !== null) {
-    const raw = match[1]; const url = normalizeUrl(raw); console.log("DEBUG_IMAGE_FOUND:", { raw, processed: url });
+    const url = normalizeUrl(match[1]);
     if (url && url.match(/\.(jpeg|jpg|gif|png|webp|avif)/i)) images.push(url);
   }
   return Array.from(new Set(images));
@@ -81,7 +89,12 @@ export default function ProjectDetail() {
         {finalHero && (
           <Reveal>
             <div className="relative w-full h-[50vh] md:h-[65vh] rounded-[48px] overflow-hidden shadow-2xl mb-16 border border-black/5 bg-white">
-              <img src={finalHero} className="w-full h-full object-cover" alt={title} />
+              <img 
+                src={finalHero} 
+                className="w-full h-full object-cover" 
+                alt={title} 
+                referrerPolicy="no-referrer"
+              />
             </div>
           </Reveal>
         )}
