@@ -18,6 +18,10 @@ export default defineConfig({
         target: 'https://sleigh.staymedia.ng/wp-json',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/wp-api/, ''),
+      },
+      '/wp-content': {
+        target: 'https://sleigh.staymedia.ng',
+        changeOrigin: true,
       }
     }
   }

@@ -6,6 +6,10 @@
       "destination": "https://sleigh.staymedia.ng/wp-json/$1"
     },
     {
+      "source": "/wp-content/(.*)",
+      "destination": "https://sleigh.staymedia.ng/wp-content/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

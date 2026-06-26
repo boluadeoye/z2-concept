@@ -8,6 +8,17 @@ const requestHeaders = {
   'Content-Type': 'application/json'
 };
 
+/**
+ * MEDIA PROXY SANITIZER
+ * Forces absolute WordPress image URLs through the Vercel/Vite bridge
+ * to bypass CORS and Mixed Content (HTTP/HTTPS) blocks.
+ */
+export function sanitizeImageUrl(url: string): string {
+  if (!url) return "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521130/blog_assets/dsitt1fhtiod9dkndedz.png";
+  // Force HTTPS and strip domain to trigger relative proxy path (/wp-content/...)
+  return url.replace('http://', 'https://').replace('https://sleigh.staymedia.ng', '');
+}
+
 // 1. CATEGORY RESOLVER
 export async function getCategoryIdBySlug(slug: string) {
   try {
@@ -73,6 +84,7 @@ export async function getSingleWPPortfolio(slug: string) {
     const items = await res.json();
     return items.length > 0 ? items[0] : null;
   } catch (e) {
+    console.error("WP Single Portfolio Error:", e);
     return null;
   }
 }
@@ -174,7 +186,7 @@ export async function createWooOrder(payload: any) {
   }
 }
 
-// 13. INQUIRY ENGINE (CF7) - RESTORED
+// 13. INQUIRY ENGINE (CF7)
 export async function submitInquiry(name: string, email: string, message: string) {
   try {
     const FORM_ID = "8";

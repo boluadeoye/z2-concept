@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "../shared/Reveal";
-import { getWooProducts } from "../../lib/woocommerce";
+import { getWooProducts, sanitizeImageUrl } from "../../lib/woocommerce";
 
 const BasketIcon = ({ className = "w-4.5 h-4.5" }: { className?: string }) => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
@@ -27,12 +27,8 @@ export default function ProductCollection({
   useEffect(() => {
     async function loadData() {
       setLoading(true);
-      // RESTORED: Dynamic WooCommerce fetch query
       const data = await getWooProducts("frame-products");
-      if (data && data.length > 0) {
-        // ENFORCED: Limit rendering strictly to first 8 products in your database
-        setProducts(data.slice(0, 8));
-      }
+      if (data && data.length > 0) setProducts(data.slice(0, 8));
       setLoading(false);
     }
     loadData();
@@ -41,13 +37,8 @@ export default function ProductCollection({
   const isMinimal = variant === "minimal";
 
   return (
-    <section className={`
-      ${isMinimal ? "pt-16" : "py-24 md:py-32 px-6 md:px-12 bg-[#FDF8F0]"} 
-      text-center w-full
-    `}>
+    <section className={`${isMinimal ? "pt-16" : "py-24 md:py-32 px-6 md:px-12 bg-[#FDF8F0]"} text-center w-full`}>
       <div className="max-w-7xl mx-auto">
-        
-        {/* DYNAMIC HEADER */}
         <Reveal>
           <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-white/50 mb-6 w-fit mx-auto">
             <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
@@ -68,13 +59,16 @@ export default function ProductCollection({
             <span className="text-xs font-bold text-black/20 uppercase tracking-widest animate-pulse">Syncing Live WordPress Catalog...</span>
           </div>
         ) : (
-          /* GRID: Sharp Edges & Correct Mobile Gutter (8 Items Max) */
           <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 md:gap-x-8 gap-y-12 mb-20 text-left">
             {products.map((p: any) => (
               <Reveal key={p.id}>
                 <Link to={`/product/${p.id}`} className="group block">
                   <div className="relative aspect-square rounded-none overflow-hidden mb-5 border border-black/5 shadow-sm bg-white">
-                    <img src={p.images?.[0]?.src} alt={p.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <img 
+                      src={sanitizeImageUrl(p.images?.[0]?.src)} 
+                      alt={p.name} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                    />
                   </div>
                   <div className="flex items-end justify-between px-1">
                     <div className="max-w-[70%]">
