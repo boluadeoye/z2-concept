@@ -8,44 +8,33 @@ import { getSingleWPPortfolio } from "../lib/woocommerce";
 
 const WP_BASE_URL = "https://sleigh.staymedia.ng";
 
-/**
- * URL NORMALIZER
- * Converts relative WordPress paths to absolute URLs
- */
 const normalizeUrl = (url: string): string => {
   if (!url) return "";
   if (url.startsWith("http")) return url;
-  if (url.startsWith("/")) return `${WP_BASE_URL}${url}`;
-  return `${WP_BASE_URL}/${url}`;
+  return `${WP_BASE_URL}${url.startsWith("/") ? "" : "/"}${url}`;
 };
 
-/**
- * HTML CONTENT REPAIR
- * Replaces relative src/href in raw HTML with absolute paths
- */
-const fixRelativeContent = (html: string): string => {
-  if (!html) return "";
-  return html.replace(
-    /(src|href)=["']\/([^"']+)["']/g,
-    `$1="${WP_BASE_URL}/$2"`
-  );
-};
-
-/**
- * GREEDY IMAGE PARSER
- */
 const extractAllImages = (html: string): string[] => {
   if (!html) return [];
   const imgRegex = /<img[^>]+(?:src|data-src)=["']([^"']+)["'][^>]*>/g;
   const images: string[] = [];
   let match;
   while ((match = imgRegex.exec(html)) !== null) {
-    const url = match[1];
-    if (url.match(/\.(jpeg|jpg|gif|png|webp|avif)/i)) {
-      images.push(normalizeUrl(url));
-    }
+    images.push(normalizeUrl(match[1]));
   }
   return Array.from(new Set(images));
+};
+
+/**
+ * MEDIA STRIPPER
+ * Removes all <img> tags and empty <p> tags from HTML to clean the narrative flow
+ */
+const stripMediaFromHtml = (html: string): string => {
+  if (!html) return "";
+  return html
+    .replace(/<img[^>]*>/g, "") // Remove images
+    .replace(/<figure[^>]*>[\s\S]*?<\/figure>/g, "") // Remove WP figure wrappers
+    .replace(/<p>\s*<\/p>/g, ""); // Remove empty paragraphs left behind
 };
 
 export default function ProjectDetail() {
@@ -86,52 +75,55 @@ export default function ProjectDetail() {
   }
 
   const title = project.title?.rendered || "";
-  const rawDesc = project.content?.rendered || "";
-  const fixedDesc = fixRelativeContent(rawDesc);
+  const rawContent = project.content?.rendered || "";
   
-  const allContentImages = extractAllImages(rawDesc);
+  // 1. Extract all images for the Gallery
+  const allImages = extractAllImages(rawContent);
   
+  // 2. Clean the text for the Narrative section
+  const cleanDescription = stripMediaFromHtml(rawContent);
+  
+  // 3. Resolve Hero
   const wpHero = project._embedded?.['wp:featuredmedia']?.[0]?.source_url;
-  const finalHero = normalizeUrl(wpHero) || (allContentImages.length > 0 ? allContentImages[0] : null);
+  const finalHero = normalizeUrl(wpHero) || (allImages.length > 0 ? allImages[0] : null);
 
-  const galleryImages = allContentImages.filter(img => img !== finalHero);
+  // 4. Resolve Gallery (Everything except the Hero)
+  const galleryImages = allImages.filter(img => img !== finalHero);
 
   const category = project._embedded?.['wp:term']?.[0]?.[0]?.name || project.acf?.category;
   const date = project.date || project.acf?.date;
-  const location = project.acf?.location;
-  const website = project.acf?.website;
 
   return (
     <main className="bg-[#FDF8F0] min-h-screen">
       <div className="max-w-7xl mx-auto px-6 md:px-12 pt-32 pb-24">
+        
+        {/* Breadcrumb */}
         <div className="mb-12">
           <Link to="/portfolio" className="inline-flex items-center gap-2 text-[12px] font-bold text-black/40 hover:text-[#FF6B35] transition-colors tracking-tight">
             <span>←</span> Portfolio / {title}
           </Link>
         </div>
 
+        {/* Hero Image: Cinematic Aspect Ratio */}
         {finalHero && (
           <Reveal>
-            <div className="relative w-full h-[50vh] md:h-[65vh] rounded-[48px] overflow-hidden shadow-2xl mb-16 border border-black/5 bg-white">
-              <img 
-                src={finalHero} 
-                className="w-full h-full object-cover" 
-                alt={title} 
-                onError={(e) => (e.currentTarget.parentElement!.style.display = 'none')}
-              />
+            <div className="relative w-full aspect-[16/10] md:aspect-[21/10] rounded-[40px] overflow-hidden shadow-2xl mb-16 border border-black/5 bg-white">
+              <img src={finalHero} className="w-full h-full object-cover" alt={title} />
             </div>
           </Reveal>
         )}
 
+        {/* Title & Meta */}
         <Reveal>
           <h1 className="text-4xl md:text-7xl font-black text-black mb-10 leading-tight tracking-tight">
             {title}
           </h1>
         </Reveal>
 
-        <ProjectMeta category={category} date={date} location={location} website={website} />
+        <ProjectMeta category={category} date={date} location={project.acf?.location} website={project.acf?.website} />
 
-        <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1.2fr] gap-12 lg:gap-24 mb-24 items-start">
+        {/* Narrative Split: Clean Text Only */}
+        <div className="grid grid-cols-1 md:grid-cols-[0.7fr_1.3fr] gap-12 lg:gap-24 mb-24 items-start">
           <Reveal>
             <h3 className="text-2xl md:text-4xl font-black text-black leading-tight tracking-tight">
               The Process: <br /> From Concept <br /> To Results
@@ -139,13 +131,18 @@ export default function ProjectDetail() {
           </Reveal>
           <Reveal>
             <div
-              className="space-y-6 text-black/70 text-sm md:text-base leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: fixedDesc }}
+              className="prose prose-sm md:prose-base max-w-none text-black/70 leading-relaxed
+                prose-headings:text-black prose-headings:font-black prose-headings:tracking-tight
+                prose-ul:list-none prose-ul:pl-0 prose-li:border-b prose-li:border-black/5 prose-li:py-3
+                prose-li:flex prose-li:justify-between prose-strong:text-black"
+              dangerouslySetInnerHTML={{ __html: cleanDescription }}
             />
           </Reveal>
         </div>
 
+        {/* Gallery: Structured Grid */}
         <ProjectGallery images={galleryImages} />
+        
         <RelatedProjects currentSlug={slug} />
       </div>
     </main>
