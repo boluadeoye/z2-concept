@@ -6,15 +6,35 @@ import RelatedProjects from "../components/portfolio/RelatedProjects";
 import { Reveal } from "../components/shared/Reveal";
 import { getSingleWPPortfolio } from "../lib/woocommerce";
 
+// GREEDY PARSER: Extracts images from any WP HTML structure
 const extractGalleryImages = (html: string): string[] => {
   if (!html) return [];
-  const imgRegex = /<img[^>]+src="([^">]+)"/g;
+  // Matches src="..." or src='...' and handles data-src for lazy loading
+  const imgRegex = /<(?:img|source)[^>]+(?:src|data-src)=["']([^"']+)["']/g;
   const images: string[] = [];
   let match;
   while ((match = imgRegex.exec(html)) !== null) {
-    images.push(match[1]);
+    const url = match[1];
+    // Filter out small icons or non-image assets
+    if (url.match(/\.(jpeg|jpg|gif|png|webp)/i) && !images.includes(url)) {
+      images.push(url);
+    }
   }
   return images;
+};
+
+// DATE NORMALIZER: Handles DD/MM/YYYY and ISO formats
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return null;
+  if (dateStr.includes('/')) {
+    const [day, month, year] = dateStr.split('/');
+    return new Date(`${year}-${month}-${day}`).toLocaleDateString("en-US", {
+      month: "long", day: "numeric", year: "numeric"
+    });
+  }
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    month: "long", day: "numeric", year: "numeric"
+  });
 };
 
 export default function ProjectDetail() {
@@ -56,13 +76,23 @@ export default function ProjectDetail() {
 
   const title = project.title?.rendered || "";
   const desc = project.content?.rendered || "";
-  const heroImage = project._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+  
+  // MEDIA LOGIC: Extract all images from content
+  const allContentImages = extractGalleryImages(desc);
+  
+  // HERO LOGIC: Priority 1: Featured Image | Priority 2: First Content Image
+  const featuredImage = project._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+  const heroImage = featuredImage || allContentImages[0];
 
+  // GALLERY LOGIC: All content images MINUS the one used for Hero
+  const galleryImages = allContentImages.filter(img => img !== heroImage);
+
+  // METADATA RESOLVERS
   const category = project._embedded?.['wp:term']?.[0]?.[0]?.name || project.acf?.category;
-  const date = project.date || project.acf?.date;
+  const rawDate = project.acf?.date || project.date;
+  const displayDate = formatDate(rawDate);
   const location = project.acf?.location;
   const website = project.acf?.website;
-  const galleryImages = extractGalleryImages(desc);
 
   return (
     <main className="bg-[#FDF8F0] min-h-screen">
@@ -87,7 +117,12 @@ export default function ProjectDetail() {
           </h1>
         </Reveal>
 
-        <ProjectMeta category={category} date={date} location={location} website={website} />
+        <ProjectMeta 
+          category={category} 
+          date={displayDate || undefined} 
+          location={location} 
+          website={website} 
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1.2fr] gap-12 lg:gap-24 mb-24 items-start">
           <Reveal>
@@ -97,7 +132,7 @@ export default function ProjectDetail() {
           </Reveal>
           <Reveal>
             <div
-              className="space-y-6 text-black/70 text-sm md:text-base leading-relaxed"
+              className="space-y-6 text-black/70 text-sm md:text-base leading-relaxed portfolio-content"
               dangerouslySetInnerHTML={{ __html: desc }}
             />
           </Reveal>
