@@ -9,18 +9,14 @@ import { getSingleWPPortfolio } from "../lib/woocommerce";
 const WP_BASE_URL = "https://sleigh.staymedia.ng";
 
 const normalizeUrl = (url: string): string => {
-  if (!url || url.includes("URL_")) return ""; // Ignore placeholders
+  if (!url) return "";
   if (url.startsWith("http")) return url;
-  const cleanPath = url.startsWith("/") ? url : `/${url}`;
-  return `${WP_BASE_URL}${cleanPath}`;
+  return `${WP_BASE_URL}${url.startsWith("/") ? url : "/" + url}`;
 };
 
 const fixRelativeContent = (html: string): string => {
   if (!html) return "";
-  return html.replace(
-    /(src|href)=["']\/([^"']+)["']/g,
-    `$1="${WP_BASE_URL}/$2"`
-  );
+  return html.replace(/(src|href)=["']\/([^"']+)["']/g, `$1="${WP_BASE_URL}/$2"`);
 };
 
 const extractAllImages = (html: string): string[] => {
@@ -30,9 +26,7 @@ const extractAllImages = (html: string): string[] => {
   let match;
   while ((match = imgRegex.exec(html)) !== null) {
     const url = normalizeUrl(match[1]);
-    if (url && url.match(/\.(jpeg|jpg|gif|png|webp|avif)/i)) {
-      images.push(url);
-    }
+    if (url && url.match(/\.(jpeg|jpg|gif|png|webp|avif)/i)) images.push(url);
   }
   return Array.from(new Set(images));
 };
@@ -77,16 +71,17 @@ export default function ProjectDetail() {
   const title = project.title?.rendered || "";
   const rawDesc = project.content?.rendered || "";
   const fixedDesc = fixRelativeContent(rawDesc);
+  
   const allContentImages = extractAllImages(rawDesc);
   
+  // DYNAMIC RESOLUTION: No hardcoding.
   const wpHero = project._embedded?.['wp:featuredmedia']?.[0]?.source_url;
   const finalHero = normalizeUrl(wpHero) || (allContentImages.length > 0 ? allContentImages[0] : null);
   const galleryImages = allContentImages.filter(img => img !== finalHero);
 
-  const category = project._embedded?.['wp:term']?.[0]?.[0]?.name || project.acf?.category;
+  const category = project._embedded?.['wp:term']?.[0]?.[0]?.name || project.acf?.category || "Photography";
   const date = project.date || project.acf?.date;
   const location = project.acf?.location;
-  const website = project.acf?.website;
 
   return (
     <main className="bg-[#FDF8F0] min-h-screen">
@@ -111,7 +106,7 @@ export default function ProjectDetail() {
           </h1>
         </Reveal>
 
-        <ProjectMeta category={category} date={date} location={location} website={website} />
+        <ProjectMeta category={category} date={date} location={location} />
 
         <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1.2fr] gap-12 lg:gap-24 mb-24 items-start">
           <Reveal>
@@ -120,9 +115,8 @@ export default function ProjectDetail() {
             </h3>
           </Reveal>
           <Reveal>
-            {/* [&_img]:hidden ensures images only show in the gallery grid, not the text */}
             <div
-              className="space-y-6 text-black/70 text-sm md:text-base leading-relaxed [&_img]:hidden"
+              className="space-y-6 text-black/70 text-sm md:text-base leading-relaxed [&_img]:hidden [&_figure]:hidden"
               dangerouslySetInnerHTML={{ __html: fixedDesc }}
             />
           </Reveal>
