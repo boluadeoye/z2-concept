@@ -6,35 +6,25 @@ import RelatedProjects from "../components/portfolio/RelatedProjects";
 import { Reveal } from "../components/shared/Reveal";
 import { getSingleWPPortfolio } from "../lib/woocommerce";
 
-// GREEDY PARSER: Extracts images from any WP HTML structure
-const extractGalleryImages = (html: string): string[] => {
+/**
+ * GREEDY IMAGE PARSER
+ * Extracts all valid image URLs from WordPress HTML content
+ */
+const extractAllImages = (html: string): string[] => {
   if (!html) return [];
-  // Matches src="..." or src='...' and handles data-src for lazy loading
-  const imgRegex = /<(?:img|source)[^>]+(?:src|data-src)=["']([^"']+)["']/g;
+  // Handles src/data-src, single/double quotes, and extra attributes
+  const imgRegex = /<img[^>]+(?:src|data-src)=["']([^"']+)["'][^>]*>/g;
   const images: string[] = [];
   let match;
   while ((match = imgRegex.exec(html)) !== null) {
     const url = match[1];
-    // Filter out small icons or non-image assets
-    if (url.match(/\.(jpeg|jpg|gif|png|webp)/i) && !images.includes(url)) {
+    // Filter for valid image extensions
+    if (url.match(/\.(jpeg|jpg|gif|png|webp|avif)/i)) {
       images.push(url);
     }
   }
-  return images;
-};
-
-// DATE NORMALIZER: Handles DD/MM/YYYY and ISO formats
-const formatDate = (dateStr: string) => {
-  if (!dateStr) return null;
-  if (dateStr.includes('/')) {
-    const [day, month, year] = dateStr.split('/');
-    return new Date(`${year}-${month}-${day}`).toLocaleDateString("en-US", {
-      month: "long", day: "numeric", year: "numeric"
-    });
-  }
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    month: "long", day: "numeric", year: "numeric"
-  });
+  // Deduplicate URLs
+  return Array.from(new Set(images));
 };
 
 export default function ProjectDetail() {
@@ -77,53 +67,56 @@ export default function ProjectDetail() {
   const title = project.title?.rendered || "";
   const desc = project.content?.rendered || "";
   
-  // MEDIA LOGIC: Extract all images from content
-  const allContentImages = extractGalleryImages(desc);
+  // 1. Extract all images from content
+  const allContentImages = extractAllImages(desc);
   
-  // HERO LOGIC: Priority 1: Featured Image | Priority 2: First Content Image
-  const featuredImage = project._embedded?.['wp:featuredmedia']?.[0]?.source_url;
-  const heroImage = featuredImage || allContentImages[0];
+  // 2. Resolve Hero Image (Featured Image OR First Content Image)
+  const wpHero = project._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+  const finalHero = wpHero || (allContentImages.length > 0 ? allContentImages[0] : null);
 
-  // GALLERY LOGIC: All content images MINUS the one used for Hero
-  const galleryImages = allContentImages.filter(img => img !== heroImage);
+  // 3. Resolve Gallery (All images EXCEPT the one used for Hero)
+  const galleryImages = allContentImages.filter(img => img !== finalHero);
 
-  // METADATA RESOLVERS
+  // Metadata Resolvers
   const category = project._embedded?.['wp:term']?.[0]?.[0]?.name || project.acf?.category;
-  const rawDate = project.acf?.date || project.date;
-  const displayDate = formatDate(rawDate);
+  const date = project.date || project.acf?.date;
   const location = project.acf?.location;
   const website = project.acf?.website;
 
   return (
     <main className="bg-[#FDF8F0] min-h-screen">
       <div className="max-w-7xl mx-auto px-6 md:px-12 pt-32 pb-24">
+        {/* Breadcrumb */}
         <div className="mb-12">
           <Link to="/portfolio" className="inline-flex items-center gap-2 text-[12px] font-bold text-black/40 hover:text-[#FF6B35] transition-colors tracking-tight">
             <span>←</span> Portfolio / {title}
           </Link>
         </div>
 
-        {heroImage && (
+        {/* Hero Image: Only renders if an image exists */}
+        {finalHero && (
           <Reveal>
-            <div className="relative w-full h-[50vh] md:h-[65vh] rounded-[48px] overflow-hidden shadow-2xl mb-16 border border-black/5">
-              <img src={heroImage} className="w-full h-full object-cover" alt={title} />
+            <div className="relative w-full h-[50vh] md:h-[65vh] rounded-[48px] overflow-hidden shadow-2xl mb-16 border border-black/5 bg-white">
+              <img 
+                src={finalHero} 
+                className="w-full h-full object-cover" 
+                alt={title} 
+                onError={(e) => (e.currentTarget.style.display = 'none')}
+              />
             </div>
           </Reveal>
         )}
 
+        {/* Title & Meta */}
         <Reveal>
           <h1 className="text-4xl md:text-7xl font-black text-black mb-10 leading-tight tracking-tight">
             {title}
           </h1>
         </Reveal>
 
-        <ProjectMeta 
-          category={category} 
-          date={displayDate || undefined} 
-          location={location} 
-          website={website} 
-        />
+        <ProjectMeta category={category} date={date} location={location} website={website} />
 
+        {/* Narrative Split */}
         <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1.2fr] gap-12 lg:gap-24 mb-24 items-start">
           <Reveal>
             <h3 className="text-2xl md:text-4xl font-black text-black leading-tight tracking-tight">
@@ -132,13 +125,16 @@ export default function ProjectDetail() {
           </Reveal>
           <Reveal>
             <div
-              className="space-y-6 text-black/70 text-sm md:text-base leading-relaxed portfolio-content"
+              className="space-y-6 text-black/70 text-sm md:text-base leading-relaxed"
               dangerouslySetInnerHTML={{ __html: desc }}
             />
           </Reveal>
         </div>
 
+        {/* Gallery: Dynamic Grid */}
         <ProjectGallery images={galleryImages} />
+        
+        {/* Related Projects: Contextual Feed */}
         <RelatedProjects currentSlug={slug} />
       </div>
     </main>
