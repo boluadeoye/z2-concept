@@ -10,8 +10,9 @@ const WP_BASE_URL = "https://sleigh.staymedia.ng";
 
 const normalizeUrl = (url: string): string => {
   if (!url) return "";
-  if (url.startsWith("http")) return url;
-  return `${WP_BASE_URL}${url.startsWith("/") ? url : "/" + url}`;
+  let clean = url.replace(/\\/g, "").replace(/"/g, "");
+  if (clean.startsWith("http")) return clean;
+  return `${WP_BASE_URL}${clean.startsWith("/") ? clean : "/" + clean}`;
 };
 
 const fixRelativeContent = (html: string): string => {
@@ -52,36 +53,21 @@ export default function ProjectDetail() {
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center bg-[#FDF8F0]">
-        <div className="text-black/20 font-black uppercase tracking-[0.5em] animate-pulse text-xl">
-          Loading Project...
-        </div>
+        <div className="text-black/20 font-black uppercase tracking-[0.5em] animate-pulse text-xl">Loading Project...</div>
       </div>
     );
   }
 
-  if (!project) {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center bg-[#FDF8F0] px-6 text-center">
-        <h1 className="text-4xl font-black text-black mb-6">Project Not Found</h1>
-        <Link to="/portfolio" className="text-[#FF6B35] font-bold underline">Return To Portfolio</Link>
-      </div>
-    );
-  }
+  if (!project) return null;
 
   const title = project.title?.rendered || "";
   const rawDesc = project.content?.rendered || "";
   const fixedDesc = fixRelativeContent(rawDesc);
-  
   const allContentImages = extractAllImages(rawDesc);
   
-  // DYNAMIC RESOLUTION: No hardcoding.
   const wpHero = project._embedded?.['wp:featuredmedia']?.[0]?.source_url;
   const finalHero = normalizeUrl(wpHero) || (allContentImages.length > 0 ? allContentImages[0] : null);
   const galleryImages = allContentImages.filter(img => img !== finalHero);
-
-  const category = project._embedded?.['wp:term']?.[0]?.[0]?.name || project.acf?.category || "Photography";
-  const date = project.date || project.acf?.date;
-  const location = project.acf?.location;
 
   return (
     <main className="bg-[#FDF8F0] min-h-screen">
@@ -101,24 +87,21 @@ export default function ProjectDetail() {
         )}
 
         <Reveal>
-          <h1 className="text-4xl md:text-7xl font-black text-black mb-10 leading-tight tracking-tight">
-            {title}
-          </h1>
+          <h1 className="text-4xl md:text-7xl font-black text-black mb-10 leading-tight tracking-tight">{title}</h1>
         </Reveal>
 
-        <ProjectMeta category={category} date={date} location={location} />
+        <ProjectMeta 
+          category={project._embedded?.['wp:term']?.[0]?.[0]?.name || "Photography"} 
+          date={project.date} 
+          location={project.acf?.location} 
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-[0.8fr_1.2fr] gap-12 lg:gap-24 mb-24 items-start">
           <Reveal>
-            <h3 className="text-2xl md:text-4xl font-black text-black leading-tight tracking-tight">
-              The Process: <br /> From Concept <br /> To Results
-            </h3>
+            <h3 className="text-2xl md:text-4xl font-black text-black leading-tight tracking-tight">The Process: <br /> From Concept <br /> To Results</h3>
           </Reveal>
           <Reveal>
-            <div
-              className="space-y-6 text-black/70 text-sm md:text-base leading-relaxed [&_img]:hidden [&_figure]:hidden"
-              dangerouslySetInnerHTML={{ __html: fixedDesc }}
-            />
+            <div className="space-y-6 text-black/70 text-sm md:text-base leading-relaxed [&_img]:hidden [&_figure]:hidden" dangerouslySetInnerHTML={{ __html: fixedDesc }} />
           </Reveal>
         </div>
 
