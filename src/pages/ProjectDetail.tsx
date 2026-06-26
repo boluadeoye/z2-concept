@@ -26,7 +26,7 @@ const extractAllImages = (html: string): string[] => {
   const images: string[] = [];
   let match;
   while ((match = imgRegex.exec(html)) !== null) {
-    const url = normalizeUrl(match[1]);
+    const raw = match[1]; const url = normalizeUrl(raw); console.log("DEBUG_IMAGE_FOUND:", { raw, processed: url });
     if (url && url.match(/\.(jpeg|jpg|gif|png|webp|avif)/i)) images.push(url);
   }
   return Array.from(new Set(images));

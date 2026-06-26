@@ -40,7 +40,7 @@ export default function PortfolioGrid() {
               slug: item.slug,
               title: item.title?.rendered,
               active: i === 1, 
-              img: normalizeUrl(featuredImg) || contentImg
+              img: normalizeUrl(featuredImg) || contentImg, _debug: console.log("DEBUG_GRID_IMG:", { featuredImg, contentImg })
             };
           });
           setProjects(mapped);
