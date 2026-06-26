@@ -4,19 +4,16 @@ import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "../shared/Reveal";
 import { getWPPortfolios } from "../../lib/woocommerce";
 
-const PROXY_PATH = "/wp-api";
 const WP_DOMAIN = "https://sleigh.staymedia.ng";
 
 const normalizeUrl = (url: string): string => {
   if (!url) return "";
   let clean = url.replace(/\\/g, "").replace(/"/g, "");
-  // Convert absolute WP links to proxied relative links
+  // Strip domain to make it a relative proxy request
   if (clean.startsWith(WP_DOMAIN)) {
-    return clean.replace(WP_DOMAIN, PROXY_PATH);
+    return clean.replace(WP_DOMAIN, "");
   }
-  if (clean.startsWith("http")) return clean;
-  const path = clean.startsWith("/") ? clean : `/${clean}`;
-  return `${PROXY_PATH}${path}`;
+  return clean;
 };
 
 const extractFirstImage = (html: string): string | null => {
@@ -87,7 +84,6 @@ export default function PortfolioGrid() {
                     <img 
                       src={project.img} 
                       alt={project.title} 
-                      referrerPolicy="no-referrer"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
                     />
                   ) : (

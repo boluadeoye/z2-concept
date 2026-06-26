@@ -6,26 +6,21 @@ import RelatedProjects from "../components/portfolio/RelatedProjects";
 import { Reveal } from "../components/shared/Reveal";
 import { getSingleWPPortfolio } from "../lib/woocommerce";
 
-const PROXY_PATH = "/wp-api";
 const WP_DOMAIN = "https://sleigh.staymedia.ng";
 
 const normalizeUrl = (url: string): string => {
   if (!url) return "";
   let clean = url.replace(/\\/g, "").replace(/"/g, "");
   if (clean.startsWith(WP_DOMAIN)) {
-    return clean.replace(WP_DOMAIN, PROXY_PATH);
+    return clean.replace(WP_DOMAIN, "");
   }
-  if (clean.startsWith("http")) return clean;
-  const path = clean.startsWith("/") ? clean : `/${clean}`;
-  return `${PROXY_PATH}${path}`;
+  return clean;
 };
 
 const fixRelativeContent = (html: string): string => {
   if (!html) return "";
-  // Fix both relative and absolute WP links in HTML
-  return html
-    .replace(/(src|href)=["']\/([^"']+)["']/g, `$1="${PROXY_PATH}/$2"`)
-    .replace(new RegExp(`(src|href)=["']${WP_DOMAIN}([^"']+)["']`, 'g'), `$1="${PROXY_PATH}$2"`);
+  // Strip domain from all internal links to trigger the proxy
+  return html.replace(new RegExp(WP_DOMAIN, 'g'), "");
 };
 
 const extractAllImages = (html: string): string[] => {
@@ -89,12 +84,7 @@ export default function ProjectDetail() {
         {finalHero && (
           <Reveal>
             <div className="relative w-full h-[50vh] md:h-[65vh] rounded-[48px] overflow-hidden shadow-2xl mb-16 border border-black/5 bg-white">
-              <img 
-                src={finalHero} 
-                className="w-full h-full object-cover" 
-                alt={title} 
-                referrerPolicy="no-referrer"
-              />
+              <img src={finalHero} className="w-full h-full object-cover" alt={title} />
             </div>
           </Reveal>
         )}
