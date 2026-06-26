@@ -4,7 +4,20 @@ import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "../shared/Reveal";
 import { getWPPortfolios } from "../../lib/woocommerce";
 
-const categories = ["All", "Photography", "Video Coverage", "Website Development", "Graphic Design"];
+const WP_BASE_URL = "https://sleigh.staymedia.ng";
+
+const normalizeUrl = (url: string): string => {
+  if (!url) return "";
+  if (url.startsWith("http")) return url;
+  return `${WP_BASE_URL}${url.startsWith("/") ? url : "/" + url}`;
+};
+
+const extractFirstImage = (html: string): string | null => {
+  if (!html) return null;
+  const imgRegex = /<img[^>]+(?:src|data-src)=["']([^"']+)["'][^>]*>/i;
+  const match = imgRegex.exec(html);
+  return match ? normalizeUrl(match[1]) : null;
+};
 
 export default function PortfolioGrid() {
   const [activeCat, setActiveCat] = useState("All");
@@ -17,13 +30,18 @@ export default function PortfolioGrid() {
       try {
         const data = await getWPPortfolios();
         if (data && data.length > 0) {
-          const mapped = data.map((item: any, i: number) => ({
-            slug: item.slug,
-            title: item.title?.rendered,
-            // Logic: Second item is active by default if it exists
-            active: i === 1, 
-            img: item._embedded?.['wp:featuredmedia']?.[0]?.source_url
-          })).filter(project => project.img); // Only show projects with valid media
+          const mapped = data.map((item: any, i: number) => {
+            const featuredImg = item._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+            const contentImg = extractFirstImage(item.content?.rendered);
+            
+            return {
+              slug: item.slug,
+              title: item.title?.rendered,
+              active: i === 1, 
+              // Priority: Featured Image > First Image in Content > Placeholder
+              img: normalizeUrl(featuredImg) || contentImg || "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137995/blog_assets/qsgt9yfrytzydaomtuwd.jpg"
+            };
+          });
           
           setProjects(mapped);
         } else {
@@ -41,7 +59,6 @@ export default function PortfolioGrid() {
 
   return (
     <section className="py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto bg-[#FDF8F0]">
-      {/* ASYMMETRIC HEADER: Title Case Enforced */}
       <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
         <Reveal>
           <div className="flex items-center gap-2 px-3 py-1 rounded-full border border-black/10 bg-white w-fit mb-4">
@@ -59,9 +76,8 @@ export default function PortfolioGrid() {
         </Reveal>
       </div>
 
-      {/* FILTER BAR */}
       <div className="flex gap-3 mb-16 overflow-x-auto pb-4 no-scrollbar">
-        {categories.map((cat) => (
+        {["All", "Photography", "Video Coverage", "Website Development", "Graphic Design"].map((cat) => (
           <button
             key={cat}
             onClick={() => setActiveCat(cat)}
@@ -76,7 +92,6 @@ export default function PortfolioGrid() {
         ))}
       </div>
 
-      {/* GRID: Zero-Fallback Logic */}
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-pulse">
           {[1, 2, 3].map((i) => (
@@ -88,7 +103,7 @@ export default function PortfolioGrid() {
           {projects.map((project, i) => (
             <Reveal key={i} delay={i * 0.1}>
               <Link to={`/portfolio/${project.slug}`} className="group flex flex-col h-full">
-                <div className="relative aspect-square rounded-[40px] overflow-hidden mb-6 shadow-2xl border border-black/5">
+                <div className="relative aspect-square rounded-[40px] overflow-hidden mb-6 shadow-2xl border border-black/5 bg-white">
                   <img 
                     src={project.img} 
                     alt={project.title} 
@@ -115,7 +130,7 @@ export default function PortfolioGrid() {
         </div>
       ) : (
         <div className="py-20 text-center">
-          <p className="text-black/20 font-bold text-xl tracking-widest uppercase">No Projects Found</p>
+          <p className="text-black/20 font-bold text-xl tracking-widest uppercase">No Projects Found In Database</p>
         </div>
       )}
     </section>
