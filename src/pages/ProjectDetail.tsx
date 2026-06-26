@@ -8,21 +8,13 @@ import { getSingleWPPortfolio } from "../lib/woocommerce";
 
 const WP_BASE_URL = "https://sleigh.staymedia.ng";
 
-/**
- * URL NORMALIZER
- * Converts relative WordPress paths to absolute URLs
- */
 const normalizeUrl = (url: string): string => {
-  if (!url) return "";
+  if (!url || url.includes("URL_")) return ""; // Ignore placeholders
   if (url.startsWith("http")) return url;
-  if (url.startsWith("/")) return `${WP_BASE_URL}${url}`;
-  return `${WP_BASE_URL}/${url}`;
+  const cleanPath = url.startsWith("/") ? url : `/${url}`;
+  return `${WP_BASE_URL}${cleanPath}`;
 };
 
-/**
- * HTML CONTENT REPAIR
- * Replaces relative src/href in raw HTML with absolute paths
- */
 const fixRelativeContent = (html: string): string => {
   if (!html) return "";
   return html.replace(
@@ -31,18 +23,15 @@ const fixRelativeContent = (html: string): string => {
   );
 };
 
-/**
- * GREEDY IMAGE PARSER
- */
 const extractAllImages = (html: string): string[] => {
   if (!html) return [];
   const imgRegex = /<img[^>]+(?:src|data-src)=["']([^"']+)["'][^>]*>/g;
   const images: string[] = [];
   let match;
   while ((match = imgRegex.exec(html)) !== null) {
-    const url = match[1];
-    if (url.match(/\.(jpeg|jpg|gif|png|webp|avif)/i)) {
-      images.push(normalizeUrl(url));
+    const url = normalizeUrl(match[1]);
+    if (url && url.match(/\.(jpeg|jpg|gif|png|webp|avif)/i)) {
+      images.push(url);
     }
   }
   return Array.from(new Set(images));
@@ -88,12 +77,10 @@ export default function ProjectDetail() {
   const title = project.title?.rendered || "";
   const rawDesc = project.content?.rendered || "";
   const fixedDesc = fixRelativeContent(rawDesc);
-  
   const allContentImages = extractAllImages(rawDesc);
   
   const wpHero = project._embedded?.['wp:featuredmedia']?.[0]?.source_url;
   const finalHero = normalizeUrl(wpHero) || (allContentImages.length > 0 ? allContentImages[0] : null);
-
   const galleryImages = allContentImages.filter(img => img !== finalHero);
 
   const category = project._embedded?.['wp:term']?.[0]?.[0]?.name || project.acf?.category;
@@ -113,12 +100,7 @@ export default function ProjectDetail() {
         {finalHero && (
           <Reveal>
             <div className="relative w-full h-[50vh] md:h-[65vh] rounded-[48px] overflow-hidden shadow-2xl mb-16 border border-black/5 bg-white">
-              <img 
-                src={finalHero} 
-                className="w-full h-full object-cover" 
-                alt={title} 
-                onError={(e) => (e.currentTarget.parentElement!.style.display = 'none')}
-              />
+              <img src={finalHero} className="w-full h-full object-cover" alt={title} />
             </div>
           </Reveal>
         )}
@@ -138,8 +120,9 @@ export default function ProjectDetail() {
             </h3>
           </Reveal>
           <Reveal>
+            {/* [&_img]:hidden ensures images only show in the gallery grid, not the text */}
             <div
-              className="space-y-6 text-black/70 text-sm md:text-base leading-relaxed"
+              className="space-y-6 text-black/70 text-sm md:text-base leading-relaxed [&_img]:hidden"
               dangerouslySetInnerHTML={{ __html: fixedDesc }}
             />
           </Reveal>
