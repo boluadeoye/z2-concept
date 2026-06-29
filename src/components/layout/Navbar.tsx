@@ -22,32 +22,29 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-[100] bg-black text-white border-b border-white/10 h-20">
+    <nav className="fixed top-0 left-0 right-0 z-[999] bg-[#0C0608] border-b border-white/5 h-20">
       <div className="h-full max-w-[1440px] mx-auto px-6">
         
-        {/* ==========================================
-            DESKTOP GRID (Visible >= 768px)
-            ========================================== */}
+        {/* DESKTOP GRID */}
         <div className="hidden md:grid h-full grid-cols-[1fr_auto_1fr] items-center">
-          
-          {/* ZONE 1: LOGO (Left Aligned) */}
           <div className="flex justify-start flex-shrink-0">
-            <Link to="/" className="flex items-center gap-3 group">
-              <span className="text-2xl lg:text-3xl font-black text-[#8B7E3D] tracking-tighter">Z2</span>
-              <span className="text-[8px] lg:text-[9px] uppercase tracking-[0.4em] text-white font-bold pt-1 whitespace-nowrap">
-                CONCEPT X KEFEE HP
+            <Link to="/" className="flex items-baseline gap-2 group">
+              <span className="inline-block text-3xl font-black text-[#FDF8F0] tracking-tighter scale-y-[1.3] origin-bottom antialiased">
+                Z2
+              </span>
+              <span className="text-[9px] uppercase tracking-[-0.05em] font-black text-white/40 leading-none">
+                Concept x Kefee HP
               </span>
             </Link>
           </div>
 
-          {/* ZONE 2: LINKS (Mathematically Centered) */}
           <div className="flex justify-center items-center gap-x-4 lg:gap-x-8 px-4">
             {navLinks.map((link) => {
               const isActive = location.pathname === link.href;
               return (
-                <Link 
-                  key={link.name} 
-                  to={link.href} 
+                <Link
+                  key={link.name}
+                  to={link.href}
                   className={`relative text-[11px] lg:text-[12px] font-bold transition-all flex items-center gap-1 group whitespace-nowrap ${
                     isActive ? "text-white" : "text-white/50 hover:text-white"
                   }`}
@@ -55,89 +52,93 @@ export default function Navbar() {
                   {link.name}
                   <span className="text-[9px] opacity-30 group-hover:text-[#FF6B35] group-hover:opacity-100">↘</span>
                   {isActive && (
-                    <span className="absolute -bottom-2 left-0 w-full h-[1.5px] bg-white" />
+                    <span className="absolute -bottom-2 left-0 w-full h-[1.5px] bg-[#FF6B35]" />
                   )}
                 </Link>
               );
             })}
           </div>
 
-          {/* ZONE 3: ACTIONS (Right Aligned) */}
           <div className="flex justify-end items-center gap-4 lg:gap-6 flex-shrink-0">
             <div className="flex items-center gap-3">
-              {/* Cart */}
               <Link to="/cart" className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-black hover:bg-[#FF6B35] hover:text-white transition-all relative">
                 <ShoppingBag size={18} strokeWidth={2.5} />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#FF6B35] text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-black">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#FF6B35] text-white text-[10px] font-black rounded-full flex items-center justify-center border-2 border-[#0C0608]">
                     {cartCount}
                   </span>
                 )}
               </Link>
-              
-              {/* Account */}
-              <Link 
-                to={user ? "/dashboard" : "/login"}
-                className="w-10 h-10 rounded-full bg-[#FF6B35] flex items-center justify-center text-white hover:bg-[#E76F51] transition-all"
-              >
+              <Link to={user ? "/dashboard" : "/login"} className="w-10 h-10 rounded-full bg-[#FF6B35] flex items-center justify-center text-white hover:bg-white hover:text-black transition-all">
                 <User size={18} strokeWidth={2.5} />
               </Link>
             </div>
-
-            {/* RESTORED: CONTACT US PILL */}
-            <Link 
-              to="/contact" 
-              className="bg-black text-white border border-white/20 rounded-full px-6 lg:px-8 py-2.5 text-[10px] font-black uppercase tracking-[0.15em] hover:border-[#FF6B35] transition-all flex items-center gap-2 whitespace-nowrap"
-            >
-              Contact Us <ArrowUpRight size={14} strokeWidth={3} className="text-[#FF6B35]" />
+            <Link to="/contact" className="bg-white text-black rounded-full px-8 py-2.5 text-[10px] font-black uppercase tracking-[0.15em] hover:bg-[#FF6B35] hover:text-white transition-all flex items-center gap-2 whitespace-nowrap">
+              Contact Us <ArrowUpRight size={14} strokeWidth={3} />
             </Link>
           </div>
         </div>
 
-        {/* ==========================================
-            MOBILE CONTAINER (Visible < 768px)
-            ========================================== */}
+        {/* MOBILE CONTAINER: Restored Account Icon */}
         <div className="flex md:hidden h-full items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <span className="text-2xl font-black text-[#8B7E3D] tracking-tighter">Z2</span>
-            <span className="text-[8px] uppercase tracking-[0.3em] text-white font-bold pt-1">
-              CONCEPT X KEFEE HP
-            </span>
+          <Link to="/" className="flex items-baseline gap-2">
+            <span className="inline-block text-2xl font-black text-[#FDF8F0] tracking-tighter scale-y-[1.3] origin-bottom">Z2</span>
+            <span className="text-[8px] uppercase tracking-tighter font-black text-white/40">Concept x Kefee HP</span>
           </Link>
-
           <div className="flex items-center gap-3">
-            <Link to="/cart" className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-black relative">
-              <ShoppingBag size={14} />
+            {/* Cart */}
+            <Link to="/cart" className="w-9 h-9 rounded-full bg-white flex items-center justify-center text-black relative">
+              <ShoppingBag size={16} />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#FF6B35] text-white text-[8px] font-black rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-4.5 h-4.5 bg-[#FF6B35] text-white text-[8px] font-black rounded-full flex items-center justify-center">
                   {cartCount}
                 </span>
               )}
             </Link>
-            <Link to={user ? "/dashboard" : "/login"} className="w-8 h-8 rounded-full bg-[#FF6B35] flex items-center justify-center text-white">
-              <User size={14} />
+            {/* RESTORED: Account Icon */}
+            <Link to={user ? "/dashboard" : "/login"} className="w-9 h-9 rounded-full bg-[#FF6B35] flex items-center justify-center text-white">
+              <User size={16} />
             </Link>
-            <button className="text-white p-1 ml-1" onClick={() => setIsOpen(true)}>
-              <Menu size={24} />
+            {/* Menu Toggle */}
+            <button onClick={() => setIsOpen(true)} className="text-white p-1">
+              <Menu size={28} />
             </button>
           </div>
         </div>
-
       </div>
 
-      {/* Mobile Menu Overlay */}
+      {/* MOBILE MENU OVERLAY */}
       {isOpen && (
-        <div className="lg:hidden fixed inset-0 top-0 bg-black z-[110] p-8 flex flex-col gap-8 animate-in fade-in slide-in-from-top-5">
-          <div className="flex justify-between items-center border-b border-white/5 pb-6">
-            <span className="text-2xl font-black text-[#8B7E3D]">Z2</span>
-            <button onClick={() => setIsOpen(false)} className="text-white"><X size={32} /></button>
+        <div className="fixed inset-0 bg-[#0C0608] z-[1000] p-8 flex flex-col overflow-y-auto">
+          <div className="flex justify-between items-center border-b border-white/5 pb-6 mb-12">
+            <span className="text-3xl font-black text-[#FDF8F0] scale-y-[1.3] origin-bottom inline-block">Z2</span>
+            <button onClick={() => setIsOpen(false)} className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center text-white">
+              <X size={32} />
+            </button>
           </div>
-          <div className="flex flex-col gap-6">
+          
+          <div className="flex flex-col gap-10">
             {navLinks.map((link) => (
-              <Link key={link.name} to={link.href} onClick={() => setIsOpen(false)} className="text-3xl font-black text-white uppercase tracking-tighter hover:text-[#FF6B35] transition-colors">{link.name}</Link>
+              <Link 
+                key={link.name} 
+                to={link.href} 
+                onClick={() => setIsOpen(false)} 
+                className="text-5xl font-black text-white uppercase tracking-tighter hover:text-[#FF6B35] transition-colors"
+              >
+                {link.name}
+              </Link>
             ))}
           </div>
-          <Link to="/contact" onClick={() => setIsOpen(false)} className="mt-auto bg-[#FF6B35] text-white text-center py-5 rounded-xl font-black uppercase tracking-widest">Contact Us ↗</Link>
+
+          <div className="mt-auto pt-12">
+            <Link 
+              to="/contact" 
+              onClick={() => setIsOpen(false)} 
+              className="w-full bg-[#FF6B35] text-white text-center py-6 rounded-2xl font-black uppercase tracking-[0.2em] text-xs flex items-center justify-center gap-3 shadow-2xl"
+            >
+              Contact Us <ArrowUpRight size={20} strokeWidth={3} />
+            </Link>
+          </div>
         </div>
       )}
     </nav>

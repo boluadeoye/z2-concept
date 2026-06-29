@@ -2,16 +2,13 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
-import Hero from './components/home/Hero';
-import IntroStatement from './components/home/IntroStatement';
-import AboutSplit from './components/home/AboutSplit';
-import ServicesOverview from './components/home/ServicesOverview';
-import PortfolioSlider from './components/home/PortfolioSlider';
-import BrandMarquee from './components/home/BrandMarquee';
-import ProductCollection from './components/home/ProductCollection';
-import PromoSection from './components/home/PromoSection';
-import Testimonials from './components/home/Testimonials';
-import ContactSection from './components/home/ContactSection';
+
+// Version 2 Components
+import HeroV2 from './components/home_v2/HeroV2';
+import PromoSlant from './components/home_v2/PromoSlant';
+import VideoPlaylist from './components/home_v2/VideoPlaylist';
+import GalleryV2 from './components/home_v2/GalleryV2';
+import ProductGridV2 from './components/home_v2/ProductGridV2';
 
 // Internal Pages
 import ServicesPage from './pages/Services';
@@ -37,16 +34,11 @@ const ScrollToTop = () => {
 
 const Home = () => (
   <div className="relative">
-    <Hero />
-    <IntroStatement />
-    <AboutSplit />
-    <ServicesOverview />
-    <PortfolioSlider />
-    <BrandMarquee />
-    <ProductCollection />
-    <PromoSection />
-    <Testimonials />
-    <ContactSection />
+    <HeroV2 />
+    <PromoSlant />
+    <VideoPlaylist />
+    <GalleryV2 />
+    <ProductGridV2 />
   </div>
 );
 
@@ -62,8 +54,9 @@ function App() {
   return (
     <div className="min-h-screen flex flex-col bg-[#FDF8F0]">
       <ScrollToTop />
+      {/* FIGMA FIDELITY: Navbar is now self-contained with solid stacking context */}
       <Navbar />
-      <div className="flex-1 pt-20">
+      <div className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/services" element={<ServicesPage />} />
