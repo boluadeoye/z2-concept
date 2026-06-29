@@ -11,11 +11,9 @@ const requestHeaders = {
 /**
  * MEDIA PROXY SANITIZER
  * Forces absolute WordPress image URLs through the Vercel/Vite bridge
- * to bypass CORS and Mixed Content (HTTP/HTTPS) blocks.
  */
 export function sanitizeImageUrl(url: string): string {
   if (!url) return "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521130/blog_assets/dsitt1fhtiod9dkndedz.png";
-  // Force HTTPS and strip domain to trigger relative proxy path (/wp-content/...)
   return url.replace('http://', 'https://').replace('https://sleigh.staymedia.ng', '');
 }
 
@@ -27,9 +25,7 @@ export async function getCategoryIdBySlug(slug: string) {
     });
     const categories = await res.json();
     return categories.length > 0 ? categories[0].id : null;
-  } catch (e) {
-    return null;
-  }
+  } catch (e) { return null; }
 }
 
 // 2. PRODUCT GRID FETCH
@@ -70,10 +66,7 @@ export async function getWPPortfolios() {
     const res = await fetch(`${baseUrl}/wp-api/wp/v2/portfolio?_embed&per_page=12`);
     if (!res.ok) return [];
     return res.json();
-  } catch (e) {
-    console.error("WP Portfolio Fetch Error:", e);
-    return [];
-  }
+  } catch (e) { return []; }
 }
 
 // 6. NATIVE PORTFOLIO SINGLE FETCH
@@ -83,9 +76,7 @@ export async function getSingleWPPortfolio(slug: string) {
     if (!res.ok) return null;
     const items = await res.json();
     return items.length > 0 ? items[0] : null;
-  } catch (e) {
-    return null;
-  }
+  } catch (e) { return null; }
 }
 
 // 7. DASHBOARD: CUSTOMER DATA
@@ -131,19 +122,10 @@ export async function loginUser(username: string, password: string) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Invalid credentials");
-
     const userRes = await fetch(`${baseUrl}/wp-api/wc/v3/customers?email=${encodeURIComponent(username)}&consumer_key=${ck}&consumer_secret=${cs}`);
     const userData = await userRes.json();
-
-    return {
-      success: true,
-      token: data.token,
-      name: data.user_display_name,
-      id: userData.length > 0 ? userData[0].id : null
-    };
-  } catch (e: any) {
-    return { success: false, error: e.message };
-  }
+    return { success: true, token: data.token, name: data.user_display_name, id: userData.length > 0 ? userData[0].id : null };
+  } catch (e: any) { return { success: false, error: e.message }; }
 }
 
 // 11. REGISTRATION ENGINE
@@ -163,29 +145,21 @@ export async function registerUser(userData: any) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Registration failed");
     return { success: true, id: data.id };
-  } catch (e: any) {
-    return { success: false, error: e.message };
-  }
+  } catch (e: any) { return { success: false, error: e.message }; }
 }
 
 // 12. ORDER CREATION ENGINE
 export async function createWooOrder(payload: any) {
   try {
     const url = `${baseUrl}/wp-api/wc/v3/orders?consumer_key=${ck}&consumer_secret=${cs}`;
-    const res = await fetch(url, {
-      method: "POST",
-      headers: requestHeaders,
-      body: JSON.stringify(payload)
-    });
+    const res = await fetch(url, { method: "POST", headers: requestHeaders, body: JSON.stringify(payload) });
     const order = await res.json();
     if (!res.ok) throw new Error(order.message || "Order Failed");
     return { success: true, orderId: order.id };
-  } catch (e: any) {
-    return { success: false, error: e.message };
-  }
+  } catch (e: any) { return { success: false, error: e.message }; }
 }
 
-// 13. INQUIRY ENGINE (CF7) - RESTORED
+// 13. INQUIRY ENGINE (CF7)
 export async function submitInquiry(name: string, email: string, message: string) {
   try {
     const FORM_ID = "8";
@@ -195,16 +169,10 @@ export async function submitInquiry(name: string, email: string, message: string
     formData.append("your-email", email);
     formData.append("your-message", message);
     formData.append("_wpcf7", FORM_ID);
-
-    const res = await fetch(url, {
-      method: "POST",
-      body: formData
-    });
+    const res = await fetch(url, { method: "POST", body: formData });
     const result = await res.json();
     return { success: result.status === "mail_sent" || result.status === "mail_failed" };
-  } catch (e) {
-    return { success: false, error: "Connection error" };
-  }
+  } catch (e) { return { success: false, error: "Connection error" }; }
 }
 
 // 14. PASSWORD RESET ENGINE
@@ -217,9 +185,7 @@ export async function sendPasswordResetEmail(userLogin: string) {
     });
     const data = await res.json();
     return { success: res.ok, message: data.message || "Request failed" };
-  } catch (e) {
-    return { success: false, error: "Connection error" };
-  }
+  } catch (e) { return { success: false, error: "Connection error" }; }
 }
 
 export async function finalizePasswordReset(payload: any) {
@@ -231,7 +197,5 @@ export async function finalizePasswordReset(payload: any) {
     });
     const data = await res.json();
     return { success: res.ok, message: data.message || "Reset failed" };
-  } catch (e) {
-    return { success: false, error: "Connection error" };
-  }
+  } catch (e) { return { success: false, error: "Connection error" }; }
 }
