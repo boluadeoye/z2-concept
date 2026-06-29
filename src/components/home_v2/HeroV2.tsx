@@ -1,112 +1,117 @@
-import React from "react";
-import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowUpRight } from "lucide-react";
-import { Reveal } from "../shared/Reveal";
 
-const cards = [
-  { img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137095/blog_assets/whpzsruxbwmmb7ckwuiq.jpg", rotate: -12, x: -40, y: 20 },
-  { img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137995/blog_assets/qsgt9yfrytzydaomtuwd.jpg", rotate: 2, x: 0, y: -20 },
-  { img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782138508/blog_assets/xgx29asy5mvyi9tnpner.jpg", rotate: 10, x: 40, y: 10 }
+const slides = [
+  "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137095/blog_assets/whpzsruxbwmmb7ckwuiq.jpg",
+  "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137995/blog_assets/qsgt9yfrytzydaomtuwd.jpg"
 ];
 
 const BrushWavy = () => (
-  <svg width="160" height="20" viewBox="0 0 160 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-[#FF6B35]">
-    <path d="M3 15C20 15 30 5 50 5C70 5 80 15 100 15C120 15 130 5 157 5" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
+  <svg width="80" height="10" viewBox="0 0 160 20" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-[#FF6B35] md:w-[120px]">
+    <path d="M3 15C20 15 30 5 50 5C70 5 80 15 100 15C120 15 130 5 157 5" stroke="currentColor" strokeWidth="12" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 );
 
 export default function HeroV2() {
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrent((prev) => (prev + 1) % slides.length), 5000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
-    <section className="relative min-h-screen w-full bg-[#0C0608] pt-28 md:pt-32 pb-40 px-6 md:px-12 flex items-center overflow-hidden z-10">
-      <div className="relative z-10 max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+    <section className="relative h-screen w-full bg-[#0C0608] overflow-hidden pt-20">
+      {/* 
+        PROMINENCE INVERSION:
+        - Slider (Left) is now the dominant 60-65%
+        - Text (Right) is the compact 35-40% sidebar
+      */}
+      <div className="flex flex-row h-full w-full items-stretch">
         
-        {/* LEFT: THE TACTILE PHOTO DECK */}
-        <div className="relative h-[400px] md:h-[650px] w-full flex items-center justify-center order-2 lg:order-1">
-          <div className="relative w-full max-w-[280px] md:max-w-[420px] aspect-[3/4]">
-            {cards.map((card, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ 
-                  opacity: 1, 
-                  scale: 1,
-                  rotate: card.rotate,
-                  x: card.x,
-                  y: card.y
-                }}
-                whileHover={{ 
-                  scale: 1.08, 
-                  rotate: 0, 
-                  x: 0,
-                  y: -40,
-                  zIndex: 60,
-                  transition: { type: "spring", stiffness: 200 }
-                }}
-                className="absolute inset-0 w-full h-full rounded-[24px] overflow-hidden shadow-[0_50px_100px_-20px_rgba(0,0,0,0.7)] border border-white/10 bg-[#1A1A1A]"
-                style={{ zIndex: i + 10 }}
-              >
-                <img src={card.img} className="w-full h-full object-cover antialiased grayscale-[20%] hover:grayscale-0 transition-all duration-500" alt="" />
-              </motion.div>
-            ))}
-          </div>
+        {/* LEFT COLUMN: DOMINANT SLIDER (60% Mobile / 65% Desktop) */}
+        <div className="relative w-[60%] md:w-[65%] h-full overflow-hidden border-r border-white/5 flex-shrink-0">
+          <AnimatePresence mode="wait">
+            <motion.img
+              key={current}
+              src={slides[current]}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.5 }}
+              className="absolute inset-0 w-full h-full object-cover antialiased"
+              alt="Z2 Visual"
+            />
+          </AnimatePresence>
+          <div className="absolute inset-0 bg-black/10 z-10" />
         </div>
 
-        {/* RIGHT: THE BRUTALIST BRAND PILLAR */}
-        <div className="text-white text-left space-y-8 md:space-y-12 order-1 lg:order-2">
-          <Reveal>
-            <div className="flex flex-col items-start">
-              <div className="flex items-end mb-2 md:mb-4">
-                <span className="inline-block text-6xl md:text-9xl font-black text-[#FDF8F0] tracking-tighter scale-y-[1.5] origin-bottom antialiased leading-[0.7]">
+        {/* RIGHT COLUMN: COMPACT TEXT SIDEBAR (40% Mobile / 35% Desktop) */}
+        <div className="w-[40%] md:w-[35%] h-full flex flex-col bg-[#0C0608] overflow-y-auto no-scrollbar flex-shrink-0">
+          <div className="flex-1 flex flex-col justify-center px-4 md:px-12 lg:px-16 py-10">
+            
+            {/* BRAND MARK: Scaled for narrow column */}
+            <div className="flex flex-col items-start mb-6 md:mb-10">
+              <div className="flex items-end">
+                <span className="inline-block text-4xl md:text-8xl font-black text-[#FDF8F0] tracking-tighter scale-y-[1.4] origin-bottom antialiased leading-none">
                   Z2
                 </span>
-                <span className="text-xl md:text-4xl font-black text-[#FDF8F0] ml-1 tracking-tighter leading-none pb-1">
+                <span className="text-lg md:text-3xl font-black text-[#FDF8F0] ml-0.5 tracking-tighter leading-none">
                   cm
                 </span>
               </div>
-              <span className="text-[9px] md:text-[10px] uppercase tracking-[0.5em] font-black text-[#FF6B35] mt-4 md:mt-6 ml-1 md:ml-2">
-                Elite Media Collective
+              <span className="text-[7px] md:text-[10px] uppercase tracking-[0.3em] font-black text-[#FF6B35] mt-4 ml-0.5">
+                Elite Media
               </span>
             </div>
 
-            <div className="space-y-6 md:space-y-8">
-              <h1 className="text-4xl md:text-7xl font-black tracking-tighter leading-[0.95] text-white italic">
+            <div className="space-y-4 md:space-y-8">
+              <h1 className="text-lg md:text-5xl font-black tracking-tighter leading-[1.1] text-white italic">
                 Creative <br />Design & <br />Print
               </h1>
               
-              <div className="space-y-4 md:space-y-6">
-                <p className="font-serif-italic text-xl md:text-3xl text-[#FDF8F0]/80 max-w-[15ch] leading-tight">
-                  Visual excellence that captures and converts.
+              <div className="space-y-3 md:space-y-6">
+                <p className="font-serif-italic text-xs md:text-2xl text-[#FDF8F0]/70 max-w-[15ch] leading-tight">
+                  Visual excellence that captures.
                 </p>
                 <BrushWavy />
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 md:gap-5 pt-8 md:pt-12 border-t border-white/10">
+            {/* Value Props: Hidden on mobile to maintain sidebar focus */}
+            <div className="hidden md:grid grid-cols-1 gap-4 pt-10 border-t border-white/10 mt-10">
               {["Media Production", "AI Content", "Gallery Framing"].map((text, i) => (
-                <div key={i} className="flex items-center gap-4 group">
-                  <div className="w-2 h-2 rounded-full bg-[#FF6B35] shadow-[0_0_15px_#FF6B35]" />
-                  <span className="text-[10px] md:text-[12px] font-black uppercase tracking-[0.3em] text-white/40 group-hover:text-white transition-colors">
+                <div key={i} className="flex items-center gap-3 group">
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/40 group-hover:text-white transition-colors">
                     {text}
                   </span>
                 </div>
               ))}
             </div>
 
-            <div className="pt-8 md:pt-12">
+            {/* CTAs: Stacked and Slimmed */}
+            <div className="pt-8 md:pt-12 flex flex-col gap-3">
               <Link 
                 to="/portfolio" 
-                className="inline-flex items-center gap-4 bg-[#FF6B35] text-white rounded-full px-10 md:px-14 py-5 md:py-6 text-[10px] md:text-[12px] font-black tracking-[0.3em] uppercase hover:bg-[#FDF8F0] hover:text-black transition-all shadow-2xl shadow-[#FF6B35]/40 group"
+                className="w-full flex items-center justify-center gap-2 bg-[#FF6B35] text-white rounded-full py-3 md:py-5 text-[9px] md:text-[11px] font-black tracking-[0.1em] uppercase hover:bg-[#FDF8F0] hover:text-black transition-all shadow-xl group"
               >
-                Explore Works 
-                <ArrowUpRight size={18} md:size={20} strokeWidth={4} className="group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform" />
+                Works <ArrowUpRight size={14} md:size={18} strokeWidth={4} />
+              </Link>
+              <Link 
+                to="/contact" 
+                className="w-full flex items-center justify-center gap-2 bg-transparent border border-white/20 text-white rounded-full py-3 md:py-5 text-[9px] md:text-[11px] font-black tracking-[0.1em] uppercase hover:bg-white hover:text-black transition-all"
+              >
+                Contact
               </Link>
             </div>
-          </Reveal>
-        </div>
-      </div>
 
-      <div className="absolute bottom-0 left-0 w-full h-32 bg-[#FF6B35] z-0" style={{ clipPath: "polygon(0 100%, 100% 100%, 100% 0, 0 70%)" }} />
+          </div>
+        </div>
+
+      </div>
     </section>
   );
 }

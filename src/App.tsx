@@ -5,7 +5,7 @@ import Footer from './components/layout/Footer';
 
 // Version 2 Components
 import HeroV2 from './components/home_v2/HeroV2';
-import PromoSlant from './components/home_v2/PromoSlant';
+import MovingTooltip from './components/home_v2/MovingTooltip';
 import VideoPlaylist from './components/home_v2/VideoPlaylist';
 import GalleryV2 from './components/home_v2/GalleryV2';
 import ProductGridV2 from './components/home_v2/ProductGridV2';
@@ -35,7 +35,7 @@ const ScrollToTop = () => {
 const Home = () => (
   <div className="relative">
     <HeroV2 />
-    <PromoSlant />
+    <MovingTooltip />
     <VideoPlaylist />
     <GalleryV2 />
     <ProductGridV2 />
@@ -54,7 +54,6 @@ function App() {
   return (
     <div className="min-h-screen flex flex-col bg-[#FDF8F0]">
       <ScrollToTop />
-      {/* FIGMA FIDELITY: Navbar is now self-contained with solid stacking context */}
       <Navbar />
       <div className="flex-1">
         <Routes>
