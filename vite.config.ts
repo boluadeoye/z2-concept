@@ -7,14 +7,13 @@ export default defineConfig({
   server: {
     proxy: {
       '/wp-api': {
-        target: 'https://sleigh.staymedia.ng/wp-json',
+        target: 'https://sleigh.staymedia.ng',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/wp-api/, '')
+        rewrite: (path) => path.replace(/^\/wp-api/, '/wp-json'),
       },
       '/wp-content': {
-        target: 'https://sleigh.staymedia.ng/wp-content',
+        target: 'https://sleigh.staymedia.ng',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/wp-content/, '')
       }
     }
   }

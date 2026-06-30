@@ -2,13 +2,29 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, AlertTriangle, Inbox } from "lucide-react";
 import { Reveal } from "../shared/Reveal";
-import { getGalleryItems, getGalleryCategories, sanitizeImageUrl } from "../../lib/woocommerce";
+import { getGalleryItems, getGalleryCategories, sanitizeImageUrl, extractContentImage } from "../../lib/woocommerce";
 
 export default function PortfolioGrid() {
   const [projects, setProjects] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [activeCat, setActiveCat] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const mapGalleryData = (data: any[]) => {
+    return (data || []).map((item: any) => {
+      // 1. Try Featured Image
+      const featured = item._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+      // 2. Fallback to Content Image (Greedy Parser)
+      const contentImg = extractContentImage(item.content?.rendered || "");
+      
+      return {
+        id: item.id,
+        slug: item.slug,
+        title: item.title?.rendered || "Untitled Project",
+        img: sanitizeImageUrl(featured || contentImg)
+      };
+    });
+  };
 
   useEffect(() => {
     async function initGallery() {
@@ -19,14 +35,7 @@ export default function PortfolioGrid() {
           getGalleryItems()
         ]);
         setCategories(catData || []);
-        
-        const mapped = (itemData || []).map((item: any) => ({
-          id: item.id,
-          slug: item.slug,
-          title: item.title?.rendered || "Untitled Project",
-          img: sanitizeImageUrl(item._embedded?.['wp:featuredmedia']?.[0]?.source_url)
-        }));
-        setProjects(mapped);
+        setProjects(mapGalleryData(itemData));
       } catch (error) {
         setProjects([]);
       } finally {
@@ -41,13 +50,7 @@ export default function PortfolioGrid() {
     setLoading(true);
     try {
       const data = await getGalleryItems(id || undefined);
-      const mapped = (data || []).map((item: any) => ({
-        id: item.id,
-        slug: item.slug,
-        title: item.title?.rendered || "Untitled Project",
-        img: sanitizeImageUrl(item._embedded?.['wp:featuredmedia']?.[0]?.source_url)
-      }));
-      setProjects(mapped);
+      setProjects(mapGalleryData(data));
     } catch (e) {
       setProjects([]);
     } finally {
@@ -69,7 +72,6 @@ export default function PortfolioGrid() {
         </Reveal>
       </div>
 
-      {/* DYNAMIC CATEGORY BAR: Only shows if categories exist in DB */}
       {categories.length > 0 && (
         <div className="flex gap-3 mb-16 overflow-x-auto pb-4 no-scrollbar">
           <button
@@ -112,6 +114,9 @@ export default function PortfolioGrid() {
                       src={project.img} 
                       alt={project.title} 
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "https://placehold.co/600x600/FDF8F0/8B7E3D?text=Media+Loading";
+                      }}
                     />
                   ) : (
                     <div className="w-full h-full flex flex-col items-center justify-center bg-black/5 text-black/20 font-black text-xs gap-2">
