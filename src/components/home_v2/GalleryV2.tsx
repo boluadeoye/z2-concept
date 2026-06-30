@@ -1,61 +1,43 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "../shared/Reveal";
 
 const gallery = [
-  "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782138508/blog_assets/xgx29asy5mvyi9tnpner.jpg",
-  "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137278/blog_assets/uftpsbjdtjezhshfwu9y.jpg",
-  "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782138122/blog_assets/imueq9xlwj0n9oxlz6ay.jpg",
-  "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782138681/blog_assets/lms2u2ymh5c0o3qc6efb.jpg",
-  "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137995/blog_assets/qsgt9yfrytzydaomtuwd.jpg",
-  "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137095/blog_assets/whpzsruxbwmmb7ckwuiq.jpg"
+  { name: "Weddings", count: "16 Photos", img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137095/blog_assets/whpzsruxbwmmb7ckwuiq.jpg" },
+  { name: "Birthdays", count: "17 Photos", img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137278/blog_assets/uftpsbjdtjezhshfwu9y.jpg" },
+  { name: "Modeling", count: "Coming Soon", img: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782138508/blog_assets/xgx29asy5mvyi9tnpner.jpg" }
 ];
 
 export default function GalleryV2() {
   return (
-    <section className="py-24 md:py-32 px-6 md:px-12 bg-white">
+    <section id="gallery" className="py-24 bg-[#0C0608] px-4 md:px-12">
       <div className="max-w-7xl mx-auto">
         
-        {/* HEADER SECTION */}
-        <div className="text-center mb-20">
-          <Reveal>
-            <div className="flex items-center gap-2 px-4 py-2 rounded-full border border-black/10 bg-[#FDF8F0] mb-6 w-fit mx-auto">
-              <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
-              <span className="font-mono text-[10px] text-black/60 font-bold uppercase tracking-widest">Gallery</span>
-            </div>
-            <h2 className="text-3xl md:text-5xl font-black text-black tracking-tight">Image Gallery</h2>
-          </Reveal>
+        <div className="flex flex-col items-center mb-16">
+          <div className="w-full h-[1px] bg-white/10 mb-10" />
+          <span className="text-[#FF6B35] text-[10px] font-black uppercase tracking-[0.3em] mb-2">Our Work</span>
+          <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter mb-10">Gallery</h2>
+          <div className="w-full h-[1px] bg-white/10" />
         </div>
 
-        {/* IMAGE GRID */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-          {gallery.map((img, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {gallery.map((item, i) => (
             <Reveal key={i} delay={i * 0.1}>
-              <div className="relative aspect-[3/4] rounded-none overflow-hidden border border-black/5 shadow-md bg-[#FDF8F0]">
+              <Link to="/gallery" className="group relative block aspect-[3/4] overflow-hidden border border-white/5">
                 <img 
-                  src={img} 
-                  className="w-full h-full object-cover transition-transform duration-700 hover:scale-105" 
-                  alt="Gallery Preview" 
+                  src={item.img} 
+                  className="w-full h-full object-cover transition-transform duration-1000 ease-in-out group-hover:scale-150" 
+                  alt={item.name} 
                 />
-              </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+                <div className="absolute inset-x-0 bottom-0 p-8 text-center">
+                  <h3 className="text-white text-2xl font-black uppercase tracking-widest mb-1">{item.name}</h3>
+                  <span className="text-[#FF6B35] text-[10px] font-black uppercase tracking-widest">{item.count}</span>
+                </div>
+              </Link>
             </Reveal>
           ))}
         </div>
-
-        {/* BOSS-MANDATED CTA: VIEW MORE */}
-        <div className="mt-16 flex justify-center">
-          <Reveal delay={0.4}>
-            <Link 
-              to="/gallery" 
-              className="inline-flex items-center gap-3 px-10 py-3.5 bg-[#0C0608] text-white rounded-full shadow-xl hover:bg-[#FF6B35] transition-all group"
-            >
-              <span className="text-[12px] font-black tracking-widest uppercase">View More</span>
-              <ArrowUpRight size={18} className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" strokeWidth={3} />
-            </Link>
-          </Reveal>
-        </div>
-
       </div>
     </section>
   );

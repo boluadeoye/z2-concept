@@ -1,20 +1,27 @@
 const ck = import.meta.env.VITE_WC_CONSUMER_KEY;
 const cs = import.meta.env.VITE_WC_CONSUMER_SECRET;
-const baseUrl = ''; 
 const WP_DOMAIN = "https://sleigh.staymedia.ng";
 
 const requestHeaders: any = {
-  "Accept": "application/json"
+  "Content-Type": "application/json",
+  "Accept": "application/json",
+  "X-Requested-With": "XMLHttpRequest"
 };
 
 const auth = `consumer_key=${ck}&consumer_secret=${cs}`;
 
+/**
+ * GREEDY PARSER: Extracts the first <img> src from a string of HTML.
+ */
 export function extractContentImage(html: string): string | null {
   if (!html) return null;
   const match = html.match(/<img[^>]+src="([^">]+)"/);
   return match ? match[1] : null;
 }
 
+/**
+ * PROXY HANDSHAKE: Strips the WP domain to trigger vercel.json/vite.config rewrites.
+ */
 export function sanitizeImageUrl(url: string | null): string | null {
   if (!url || url === "" || url.includes("undefined")) return null;
   let clean = url.replace(/\\/g, "").replace(/"/g, "");
@@ -25,24 +32,14 @@ export function sanitizeImageUrl(url: string | null): string | null {
   return clean.startsWith("/") ? clean : `/${clean}`;
 }
 
-// 1. GALLERY ENGINE - STRIPPED OF 403 TRIGGERS
+// 1. GALLERY ENGINE
 export async function getGalleryItems(categoryId?: number) {
   try {
-    // Removed status=publish to avoid capability check 403
-    let url = `/wp-api/wp/v2/gallery?_embed=1&per_page=100`;
+    let url = `/wp-api/wp/v2/gallery?_embed=1&status=publish&per_page=100`;
     if (categoryId) url += `&gallery_category=${categoryId}`;
-    
     const res = await fetch(url, { headers: requestHeaders });
-    if (!res.ok) {
-      const errorText = await res.text();
-      console.error(`GALLERY_403_DEBUG: ${res.status}`, errorText);
-      return [];
-    }
-    return await res.json();
-  } catch (e) { 
-    console.error("FETCH_FAILURE:", e);
-    return []; 
-  }
+    return res.ok ? res.json() : [];
+  } catch (e) { return []; }
 }
 
 export const getWPGalleries = getGalleryItems;
@@ -63,9 +60,11 @@ export async function getSingleWPPortfolio(slug: string) {
 }
 
 // 2. PRODUCT ENGINE
-export async function getWooProducts(categorySlug?: string) {
+export async function getWooProducts(categoryId?: number) {
   try {
-    const res = await fetch(`/wp-api/wc/v3/products?${auth}&per_page=12&status=publish`, { headers: requestHeaders });
+    let url = `/wp-api/wc/v3/products?${auth}&per_page=12&status=publish`;
+    if (categoryId) url += `&category=${categoryId}`;
+    const res = await fetch(url, { headers: requestHeaders });
     return res.ok ? res.json() : [];
   } catch (e) { return []; }
 }
