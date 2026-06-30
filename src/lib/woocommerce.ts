@@ -17,7 +17,37 @@ export function sanitizeImageUrl(url: string): string {
   return url.replace('http://', 'https://').replace('https://sleigh.staymedia.ng', '');
 }
 
-// 1. CATEGORY RESOLVER
+// 1. GALLERY FETCHERS
+export async function getWPGalleries(categorySlug?: string) {
+  try {
+    let url = `${baseUrl}/wp-api/wp/v2/gallery?_embed&per_page=100`;
+    if (categorySlug) {
+      const catRes = await fetch(`${baseUrl}/wp-api/wp/v2/gallery_category?slug=${categorySlug}`);
+      const cats = await catRes.json();
+      if (cats.length > 0) url += `&gallery_category=${cats[0].id}`;
+    }
+    const res = await fetch(url);
+    if (!res.ok) {
+      const fallback = await fetch(`${baseUrl}/wp-api/wp/v2/portfolio?_embed&per_page=100`);
+      return fallback.json();
+    }
+    return res.json();
+  } catch (e) { return []; }
+}
+
+export async function getGalleryCategories() {
+  try {
+    const res = await fetch(`${baseUrl}/wp-api/wp/v2/gallery_category`);
+    if (!res.ok) return [
+      { name: "Wedding", slug: "wedding" }, 
+      { name: "Birthday", slug: "birthday" }, 
+      { name: "Graduation", slug: "graduation" }
+    ];
+    return res.json();
+  } catch (e) { return []; }
+}
+
+// 2. CATEGORY RESOLVER
 export async function getCategoryIdBySlug(slug: string) {
   try {
     const res = await fetch(`${baseUrl}/wp-api/wc/v3/products/categories?slug=${slug}&consumer_key=${ck}&consumer_secret=${cs}`, {
@@ -28,7 +58,7 @@ export async function getCategoryIdBySlug(slug: string) {
   } catch (e) { return null; }
 }
 
-// 2. PRODUCT GRID FETCH
+// 3. PRODUCT GRID FETCH
 export async function getWooProducts(categorySlug?: string) {
   try {
     let url = `${baseUrl}/wp-api/wc/v3/products?consumer_key=${ck}&consumer_secret=${cs}&per_page=12&status=publish`;
@@ -41,65 +71,59 @@ export async function getWooProducts(categorySlug?: string) {
   } catch (e) { return []; }
 }
 
-// 3. SINGLE PRODUCT FETCH
+// 4. SINGLE PRODUCT FETCH
 export async function getSingleProduct(id: string) {
   try {
     const url = `${baseUrl}/wp-api/wc/v3/products/${id}?consumer_key=${ck}&consumer_secret=${cs}`;
     const res = await fetch(url, { headers: requestHeaders });
-    if (!res.ok) return null;
-    return res.json();
+    return res.ok ? res.json() : null;
   } catch (e) { return null; }
 }
 
-// 4. BLOG POST FETCH
+// 5. BLOG POST FETCH
 export async function getWPPosts() {
   try {
     const res = await fetch(`${baseUrl}/wp-api/wp/v2/posts?_embed&per_page=6`);
-    if (!res.ok) return [];
-    return res.json();
+    return res.ok ? res.json() : [];
   } catch (e) { return []; }
 }
 
-// 5. NATIVE PORTFOLIO LIST FETCH
+// 6. NATIVE PORTFOLIO LIST FETCH (Legacy Fallback)
 export async function getWPPortfolios() {
   try {
     const res = await fetch(`${baseUrl}/wp-api/wp/v2/portfolio?_embed&per_page=12`);
-    if (!res.ok) return [];
-    return res.json();
+    return res.ok ? res.json() : [];
   } catch (e) { return []; }
 }
 
-// 6. NATIVE PORTFOLIO SINGLE FETCH
+// 7. NATIVE PORTFOLIO SINGLE FETCH (Legacy Fallback)
 export async function getSingleWPPortfolio(slug: string) {
   try {
     const res = await fetch(`${baseUrl}/wp-api/wp/v2/portfolio?slug=${slug}&_embed`);
-    if (!res.ok) return null;
     const items = await res.json();
     return items.length > 0 ? items[0] : null;
   } catch (e) { return null; }
 }
 
-// 7. DASHBOARD: CUSTOMER DATA
+// 8. DASHBOARD: CUSTOMER DATA
 export async function getCustomerData(id: string | number) {
   try {
     const url = `${baseUrl}/wp-api/wc/v3/customers/${id}?consumer_key=${ck}&consumer_secret=${cs}`;
     const res = await fetch(url, { headers: requestHeaders });
-    if (!res.ok) return null;
-    return res.json();
+    return res.ok ? res.json() : null;
   } catch (e) { return null; }
 }
 
-// 8. DASHBOARD: CUSTOMER ORDERS
+// 9. DASHBOARD: CUSTOMER ORDERS
 export async function getCustomerOrders(id: string | number) {
   try {
     const url = `${baseUrl}/wp-api/wc/v3/orders?customer=${id}&consumer_key=${ck}&consumer_secret=${cs}`;
     const res = await fetch(url, { headers: requestHeaders });
-    if (!res.ok) return [];
-    return res.json();
+    return res.ok ? res.json() : [];
   } catch (e) { return []; }
 }
 
-// 9. DASHBOARD: UPDATE ADDRESS
+// 10. DASHBOARD: UPDATE ADDRESS
 export async function updateCustomerAddress(id: string | number, shippingData: any) {
   try {
     const url = `${baseUrl}/wp-api/wc/v3/customers/${id}?consumer_key=${ck}&consumer_secret=${cs}`;
@@ -112,7 +136,7 @@ export async function updateCustomerAddress(id: string | number, shippingData: a
   } catch (e) { return { success: false }; }
 }
 
-// 10. LOGIN ENGINE (JWT)
+// 11. LOGIN ENGINE (JWT)
 export async function loginUser(username: string, password: string) {
   try {
     const res = await fetch(`${baseUrl}/wp-api/jwt-auth/v1/token`, {
@@ -122,13 +146,22 @@ export async function loginUser(username: string, password: string) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Invalid credentials");
+
     const userRes = await fetch(`${baseUrl}/wp-api/wc/v3/customers?email=${encodeURIComponent(username)}&consumer_key=${ck}&consumer_secret=${cs}`);
     const userData = await userRes.json();
-    return { success: true, token: data.token, name: data.user_display_name, id: userData.length > 0 ? userData[0].id : null };
-  } catch (e: any) { return { success: false, error: e.message }; }
+
+    return {
+      success: true,
+      token: data.token,
+      name: data.user_display_name,
+      id: userData.length > 0 ? userData[0].id : null
+    };
+  } catch (e: any) {
+    return { success: false, error: e.message };
+  }
 }
 
-// 11. REGISTRATION ENGINE
+// 12. REGISTRATION ENGINE
 export async function registerUser(userData: any) {
   try {
     const res = await fetch(`${baseUrl}/wp-api/wc/v3/customers?consumer_key=${ck}&consumer_secret=${cs}`, {
@@ -145,21 +178,28 @@ export async function registerUser(userData: any) {
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Registration failed");
     return { success: true, id: data.id };
-  } catch (e: any) { return { success: false, error: e.message }; }
+  } catch (e: any) {
+    return { success: false, error: e.message };
+  }
 }
 
-// 12. ORDER CREATION ENGINE
+// 13. ORDER CREATION ENGINE
 export async function createWooOrder(payload: any) {
   try {
     const url = `${baseUrl}/wp-api/wc/v3/orders?consumer_key=${ck}&consumer_secret=${cs}`;
-    const res = await fetch(url, { method: "POST", headers: requestHeaders, body: JSON.stringify(payload) });
+    const res = await fetch(url, {
+      method: "POST",
+      headers: requestHeaders,
+      body: JSON.stringify(payload)
+    });
     const order = await res.json();
-    if (!res.ok) throw new Error(order.message || "Order Failed");
-    return { success: true, orderId: order.id };
-  } catch (e: any) { return { success: false, error: e.message }; }
+    return { success: res.ok, orderId: order.id };
+  } catch (e: any) {
+    return { success: false, error: e.message };
+  }
 }
 
-// 13. INQUIRY ENGINE (CF7)
+// 14. INQUIRY ENGINE (CF7)
 export async function submitInquiry(name: string, email: string, message: string) {
   try {
     const FORM_ID = "8";
@@ -169,13 +209,19 @@ export async function submitInquiry(name: string, email: string, message: string
     formData.append("your-email", email);
     formData.append("your-message", message);
     formData.append("_wpcf7", FORM_ID);
-    const res = await fetch(url, { method: "POST", body: formData });
+
+    const res = await fetch(url, {
+      method: "POST",
+      body: formData
+    });
     const result = await res.json();
     return { success: result.status === "mail_sent" || result.status === "mail_failed" };
-  } catch (e) { return { success: false, error: "Connection error" }; }
+  } catch (e) {
+    return { success: false, error: "Connection error" };
+  }
 }
 
-// 14. PASSWORD RESET ENGINE
+// 15. PASSWORD RESET ENGINE
 export async function sendPasswordResetEmail(userLogin: string) {
   try {
     const res = await fetch(`${baseUrl}/wp-api/z2/v1/forgot-password`, {
@@ -185,7 +231,9 @@ export async function sendPasswordResetEmail(userLogin: string) {
     });
     const data = await res.json();
     return { success: res.ok, message: data.message || "Request failed" };
-  } catch (e) { return { success: false, error: "Connection error" }; }
+  } catch (e) {
+    return { success: false, error: "Connection error" };
+  }
 }
 
 export async function finalizePasswordReset(payload: any) {
@@ -197,5 +245,7 @@ export async function finalizePasswordReset(payload: any) {
     });
     const data = await res.json();
     return { success: res.ok, message: data.message || "Reset failed" };
-  } catch (e) { return { success: false, error: "Connection error" }; }
+  } catch (e) {
+    return { success: false, error: "Connection error" };
+  }
 }
