@@ -2,10 +2,8 @@ import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, EffectFade, Navigation, Pagination } from "swiper/modules";
 import { Link } from "react-router-dom";
-import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { Reveal } from "../shared/Reveal";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
-// Import Swiper core and required module styles
 import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/navigation";
@@ -27,7 +25,7 @@ export default function HeroV2() {
     <section className="relative h-screen w-full bg-[#0C0608] overflow-hidden pt-20">
       <div className="flex flex-row h-full w-full items-stretch">
         
-        {/* LEFT COLUMN: SWIPERJS SLIDER (60% Mobile / 65% Desktop) */}
+        {/* LEFT COLUMN: SLIDER (65%) */}
         <div className="relative w-[60%] md:w-[65%] h-full overflow-hidden border-r border-white/5 flex-shrink-0 group">
           <Swiper
             modules={[Autoplay, EffectFade, Navigation, Pagination]}
@@ -35,127 +33,82 @@ export default function HeroV2() {
             fadeEffect={{ crossFade: true }}
             autoplay={{ delay: 5000, disableOnInteraction: false }}
             loop={true}
-            navigation={{
-              prevEl: ".hero-v2-prev",
-              nextEl: ".hero-v2-next",
-            }}
-            pagination={{
-              clickable: true,
-              el: ".hero-v2-pagination",
-              bulletClass: "hero-v2-bullet",
-              bulletActiveClass: "hero-v2-bullet-active",
-            }}
+            navigation={{ prevEl: ".hero-v2-prev", nextEl: ".hero-v2-next" }}
+            pagination={{ clickable: true, el: ".hero-v2-pagination", bulletClass: "hero-v2-bullet", bulletActiveClass: "hero-v2-bullet-active" }}
             className="w-full h-full"
           >
             {slides.map((img, idx) => (
               <SwiperSlide key={idx} className="w-full h-full relative">
-                <img 
-                  src={img} 
-                  className="w-full h-full object-cover antialiased" 
-                  alt="Slide Visual" 
-                />
+                <img src={img} className="w-full h-full object-cover antialiased" alt="Slide Visual" />
               </SwiperSlide>
             ))}
           </Swiper>
-          
           <div className="absolute inset-0 bg-black/15 z-10 pointer-events-none" />
-
-          {/* Figma Custom Navigation: Left / Right Arrows inside Slider */}
           <div className="absolute bottom-6 right-6 z-30 hidden md:flex gap-3">
-            <button className="hero-v2-prev w-12 h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-[#FF6B35] hover:border-[#FF6B35] transition-all cursor-pointer">
+            <button className="hero-v2-prev w-12 h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-[#FF6B35] transition-all cursor-pointer">
               <ChevronLeft size={20} strokeWidth={2.5} />
             </button>
-            <button className="hero-v2-next w-12 h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-[#FF6B35] hover:border-[#FF6B35] transition-all cursor-pointer">
+            <button className="hero-v2-next w-12 h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-[#FF6B35] transition-all cursor-pointer">
               <ChevronRight size={20} strokeWidth={2.5} />
             </button>
           </div>
-
-          {/* Figma Pagination Dots */}
           <div className="hero-v2-pagination absolute bottom-6 left-6 z-30 flex gap-2 md:hidden" />
         </div>
 
-        {/* RIGHT COLUMN: COMPACT TEXT SIDEBAR (40% Mobile / 35% Desktop) */}
+        {/* RIGHT COLUMN: SIDEBAR (35%) */}
         <div className="w-[40%] md:w-[35%] h-full flex flex-col bg-[#0C0608] overflow-y-auto no-scrollbar flex-shrink-0">
-          <div className="flex-1 flex flex-col justify-center px-4 md:px-12 lg:px-16 py-10">
+          <div className="flex-1 flex flex-col justify-center px-5 md:px-12 py-10">
             
             {/* BRAND MARK */}
-            <div className="flex flex-col items-start mb-6 md:mb-10">
+            <div className="flex flex-col items-start mb-8">
               <div className="flex items-end">
-                <span className="inline-block text-4xl md:text-8xl font-black text-[#FDF8F0] tracking-tighter scale-y-[1.4] origin-bottom antialiased leading-none">
-                  Z2
-                </span>
-                <span className="text-lg md:text-3xl font-black text-[#FDF8F0] ml-0.5 tracking-tighter leading-none">
-                  cm
-                </span>
+                <span className="inline-block text-4xl md:text-8xl font-black text-[#FDF8F0] tracking-tighter scale-y-[1.4] origin-bottom antialiased leading-none">Z2</span>
+                <span className="text-lg md:text-3xl font-black text-[#FDF8F0] ml-0.5 tracking-tighter leading-none">cm</span>
               </div>
-              <span className="text-[7px] md:text-[10px] uppercase tracking-[0.3em] font-black text-[#FF6B35] mt-4 ml-0.5">
-                Elite Media
-              </span>
+              <span className="text-[7px] md:text-[10px] uppercase tracking-[0.3em] font-black text-[#8B7E3D] mt-4 ml-0.5">Elite Media</span>
             </div>
 
-            <div className="space-y-4 md:space-y-8">
-              <h1 className="text-lg md:text-5xl font-black tracking-tighter leading-[1.1] text-white italic">
-                Creative <br />Design & <br />Print
-              </h1>
-              
-              <div className="space-y-3 md:space-y-6">
-                <p className="font-serif-italic text-xs md:text-2xl text-[#FDF8F0]/70 max-w-[15ch] leading-tight">
-                  Visual excellence that captures.
-                </p>
+            <div className="space-y-6">
+              <h1 className="text-lg md:text-5xl font-black tracking-tighter leading-[1.1] text-white italic">Media and <br />Digital <br />Services</h1>
+              <div className="space-y-4">
+                <p className="font-serif-italic text-xs md:text-2xl text-[#FDF8F0]/70 max-w-[15ch] leading-tight">Visual excellence that captures.</p>
                 <BrushWavy />
               </div>
             </div>
 
-            {/* Value Props */}
-            <div className="hidden md:grid grid-cols-1 gap-4 pt-10 border-t border-white/10 mt-10">
-              {["Media Production", "AI Content", "Gallery Framing"].map((text, i) => (
+            {/* Lowercase Service List */}
+            <div className="grid grid-cols-1 gap-3 pt-10 border-t border-white/10 mt-10">
+              {["photography", "video production", "web development"].map((text, i) => (
                 <div key={i} className="flex items-center gap-3 group">
                   <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" />
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 group-hover:text-white transition-colors">
-                    {text}
-                  </span>
+                  <span className="text-[11px] font-bold text-white/40 group-hover:text-white transition-colors">{text}</span>
                 </div>
               ))}
             </div>
 
-            {/* CTAs */}
-            <div className="pt-8 md:pt-12 flex flex-col gap-3">
+            {/* SLEEK COMPACT CTA PILLS */}
+            <div className="pt-10 flex flex-col gap-3">
               <Link 
-                to="/portfolio" 
-                className="w-full flex items-center justify-center gap-2 bg-[#FF6B35] text-white rounded-full py-3 md:py-5 text-[9px] md:text-[11px] font-black tracking-[0.1em] uppercase hover:bg-[#FDF8F0] hover:text-black transition-all shadow-xl group"
+                to="/gallery" 
+                className="w-full bg-[#FF6B35] text-white rounded-full py-2.5 px-6 text-center text-[12px] font-black tracking-tight whitespace-nowrap hover:bg-white hover:text-black transition-all shadow-lg shadow-[#FF6B35]/10"
               >
-                Works <ArrowUpRight size={14} md:size={18} strokeWidth={4} />
+                See Our Work
               </Link>
               <Link 
                 to="/contact" 
-                className="w-full flex items-center justify-center gap-2 bg-transparent border border-white/20 text-white rounded-full py-3 md:py-5 text-[9px] md:text-[11px] font-black tracking-[0.1em] uppercase hover:bg-white hover:text-black transition-all"
+                className="w-full bg-transparent border border-white/20 text-white rounded-full py-2.5 px-6 text-center text-[12px] font-black tracking-tight whitespace-nowrap hover:bg-white hover:text-black transition-all"
               >
-                Contact
+                Work With Us
               </Link>
             </div>
 
           </div>
         </div>
-
       </div>
 
-      {/* Styled Swiper Bullet points inside HTML Style tag to prevent Tailwind compiler injection errors */}
       <style>{`
-        .hero-v2-bullet {
-          width: 6px;
-          height: 6px;
-          display: inline-block;
-          border-radius: 9999px;
-          background: rgba(255, 255, 255, 0.3);
-          margin: 0 4px;
-          cursor: pointer;
-          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .hero-v2-bullet-active {
-          width: 24px;
-          background: #FF6B35 !important;
-          border-radius: 4px;
-        }
+        .hero-v2-bullet { width: 6px; height: 6px; display: inline-block; border-radius: 9999px; background: rgba(255, 255, 255, 0.3); margin: 0 4px; cursor: pointer; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .hero-v2-bullet-active { width: 24px; background: #FF6B35 !important; border-radius: 4px; }
       `}</style>
     </section>
   );

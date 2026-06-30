@@ -24,6 +24,7 @@ import ContactPage from './pages/Contact';
 import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
 import ForgotPasswordPage from './pages/ForgotPassword';
+import ResetPasswordPage from './pages/ResetPassword';
 import DashboardPage from './pages/Dashboard';
 
 const ScrollToTop = () => {
@@ -46,7 +47,7 @@ const NotFound = () => (
   <div className="min-h-[60vh] flex flex-col items-center justify-center gap-6 bg-[#FDF8F0]">
     <h1 className="text-6xl font-black text-black opacity-10">404</h1>
     <h2 className="text-2xl font-bold uppercase tracking-widest text-black">Page Not Found</h2>
-    <a href="/" className="btn-pill bg-black text-white">Return Home</a>
+    <a href="/" className="px-8 py-3 bg-black text-white rounded-full font-bold text-sm">Return Home</a>
   </div>
 );
 
@@ -60,8 +61,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/portfolio" element={<PortfolioPage />} />
-          <Route path="/portfolio/:slug" element={<ProjectDetail />} />
+          <Route path="/gallery" element={<PortfolioPage />} />
+          <Route path="/gallery/:slug" element={<ProjectDetail />} />
           <Route path="/store" element={<StorePage />} />
           <Route path="/product/:id" element={<ProductDetail />} />
           <Route path="/blog" element={<BlogPage />} />
@@ -71,6 +72,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

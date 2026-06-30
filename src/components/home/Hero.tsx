@@ -1,94 +1,76 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-
-const slides = [
-  {
-    image: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137095/blog_assets/whpzsruxbwmmb7ckwuiq.jpg",
-    heading: "From media production to digital experiences",
-    subtext: "We combine creativity with tech to deliver visual excellence",
-    ctaPrimary: "View Our Works",
-    ctaSecondary: "Contact Us",
-    linkPrimary: "/portfolio",
-    linkSecondary: "/contact"
-  },
-  {
-    image: "https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137095/blog_assets/whpzsruxbwmmb7ckwuiq.jpg",
-    heading: "Create. Captivate. Convert",
-    subtext: "Professional photography, video production, web design, branding, and AI-powered content solutions tailored for you",
-    ctaPrimary: "View Our Works",
-    ctaSecondary: "Get Started",
-    linkPrimary: "/portfolio",
-    linkSecondary: "/register"
-  }
-];
+import { Reveal } from "../shared/Reveal";
 
 export default function Hero() {
-  const [current, setCurrent] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrent((prev) => (prev + 1) % slides.length), 8000);
-    return () => clearInterval(timer);
-  }, []);
-
   return (
-    <section className="relative h-screen w-full flex items-center justify-center overflow-hidden bg-black pt-20">
-      {slides.map((slide, idx) => (
-        <div key={idx} className={`absolute inset-0 transition-opacity duration-1000 ${idx === current ? "opacity-60" : "opacity-0"}`}>
-          <img src={slide.image} alt="Hero" className="w-full h-full object-cover object-center" />
-        </div>
-      ))}
-      <div className="absolute inset-0 bg-black/40 z-0" />
-
-      <div className="relative z-10 max-w-5xl mx-auto px-6 text-center text-white">
-        {/* Figma Fidelity: Strict max-width on H1 to prevent chevron collision on all viewports */}
-        <h1 className="text-3xl md:text-6xl font-black leading-[1.15] mb-6 tracking-tight max-w-[240px] sm:max-w-3xl lg:max-w-4xl mx-auto antialiased">
-          {slides[current].heading}
-        </h1>
-        
-        {/* Figma Fidelity: Tightened max-width on P to ensure subtext stays in the "Safe Zone" between arrows on mobile */}
-        <p className="text-white/80 text-sm md:text-base max-w-[220px] sm:max-w-xl mx-auto mb-10 font-medium leading-relaxed">
-          {slides[current].subtext}
-        </p>
-
-        {/* Figma Fidelity: Responsive Stack with white-space lock and compact mobile max-width */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-[260px] sm:max-w-none mx-auto">
-          <Link 
-            to={slides[current].linkPrimary} 
-            className="w-full sm:w-auto px-10 py-4 bg-[#FF6B35] text-white rounded-full font-bold text-xs tracking-wider transition-all duration-300 border border-[#FF6B35] hover:bg-black hover:border-black whitespace-nowrap text-center"
-          >
-            {slides[current].ctaPrimary}
-          </Link>
-          <Link 
-            to={slides[current].linkSecondary} 
-            className="w-full sm:w-auto px-10 py-4 bg-transparent border border-white/40 text-white rounded-full font-bold text-xs tracking-wider hover:bg-white hover:text-black transition-all whitespace-nowrap text-center"
-          >
-            {slides[current].ctaSecondary}
-          </Link>
-        </div>
+    <section className="relative min-h-screen w-full flex flex-col justify-center bg-[#0C0608] overflow-hidden px-8 md:px-24 pt-20">
+      {/* BACKGROUND LAYER: Full screen "Poster" style */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137095/blog_assets/whpzsruxbwmmb7ckwuiq.jpg" 
+          alt="Hero Background" 
+          className="w-full h-full object-cover opacity-50"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0C0608] via-[#0C0608]/80 to-transparent" />
       </div>
 
-      {/* Navigation Arrows: Absolutely positioned at edges */}
-      <div className="absolute inset-x-2 md:inset-x-8 top-1/2 -translate-y-1/2 flex justify-between pointer-events-none z-20">
-        <button 
-          onClick={() => setCurrent((prev) => (prev - 1 + slides.length) % slides.length)} 
-          className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white pointer-events-auto hover:bg-[#FF6B35] transition-all"
-        >
-          <ChevronLeft size={18} />
-        </button>
-        <button 
-          onClick={() => setCurrent((prev) => (prev + 1) % slides.length)} 
-          className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/20 bg-black/40 backdrop-blur-sm flex items-center justify-center text-white pointer-events-auto hover:bg-[#FF6B35] transition-all"
-        >
-          <ChevronRight size={18} />
-        </button>
-      </div>
+      <div className="relative z-10 max-w-4xl">
+        {/* BRAND BLOCK */}
+        <Reveal className="mb-12">
+          <div className="flex flex-col">
+            <div className="flex items-baseline gap-1">
+              <span className="text-6xl font-black text-white scale-y-[1.4] origin-bottom inline-block tracking-tighter">Z2</span>
+              <span className="text-2xl font-black text-white">cm</span>
+            </div>
+            <span className="text-[#8B7E3D] text-[10px] font-bold tracking-[0.4em] mt-2 uppercase">Elite Media</span>
+          </div>
+        </Reveal>
 
-      {/* Slide Indicators */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-        {slides.map((_, idx) => (
-          <div key={idx} className={`h-1.5 rounded-full transition-all duration-300 ${idx === current ? "w-8 bg-[#FF6B35]" : "w-2 bg-white/30"}`} />
-        ))}
+        {/* PRIMARY HEADING: Media and Digital Services */}
+        <Reveal delay={0.1}>
+          <h1 className="text-5xl md:text-8xl font-black text-white leading-[0.9] tracking-tighter mb-8 max-w-[12ch]">
+            Media and Digital Services
+          </h1>
+        </Reveal>
+
+        {/* NARRATIVE & SQUIGGLE */}
+        <Reveal delay={0.2} className="mb-16">
+          <p className="text-white/80 text-lg md:text-xl font-medium italic mb-4">
+            Visual excellence that captures.
+          </p>
+          <svg width="120" height="12" viewBox="0 0 120 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 10C20 2 40 12 60 6C80 0 100 10 118 4" stroke="#FF6B35" strokeWidth="3" strokeLinecap="round"/>
+          </svg>
+        </Reveal>
+
+        {/* SERVICE INDEX & CTAS */}
+        <div className="flex flex-col gap-12">
+          {/* Lowercase Service List */}
+          <Reveal delay={0.3}>
+            <ul className="space-y-2">
+              <li className="flex items-center gap-3 text-white/60 text-sm font-bold">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" /> photography
+              </li>
+              <li className="flex items-center gap-3 text-white/60 text-sm font-bold">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" /> video production
+              </li>
+              <li className="flex items-center gap-3 text-white/60 text-sm font-bold">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35]" /> web development
+              </li>
+            </ul>
+          </Reveal>
+
+          {/* Text CTAs: Updated Routes */}
+          <Reveal delay={0.4} className="space-y-4">
+            <Link to="/gallery" className="block text-white text-lg font-black tracking-tight hover:text-[#FF6B35] transition-colors">
+              See our work — (/gallery)
+            </Link>
+            <Link to="/contact" className="block text-white text-lg font-black tracking-tight hover:text-[#FF6B35] transition-colors">
+              Work with us — (/contact)
+            </Link>
+          </Reveal>
+        </div>
       </div>
     </section>
   );

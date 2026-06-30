@@ -11,15 +11,12 @@ const WP_DOMAIN = "https://sleigh.staymedia.ng";
 const normalizeUrl = (url: string): string => {
   if (!url) return "";
   let clean = url.replace(/\\/g, "").replace(/"/g, "");
-  if (clean.startsWith(WP_DOMAIN)) {
-    return clean.replace(WP_DOMAIN, "");
-  }
+  if (clean.startsWith(WP_DOMAIN)) return clean.replace(WP_DOMAIN, "");
   return clean;
 };
 
 const fixRelativeContent = (html: string): string => {
   if (!html) return "";
-  // Strip domain from all internal links to trigger the proxy
   return html.replace(new RegExp(WP_DOMAIN, 'g'), "");
 };
 
@@ -76,8 +73,8 @@ export default function ProjectDetail() {
     <main className="bg-[#FDF8F0] min-h-screen">
       <div className="max-w-7xl mx-auto px-6 md:px-12 pt-32 pb-24">
         <div className="mb-12">
-          <Link to="/portfolio" className="inline-flex items-center gap-2 text-[12px] font-bold text-black/40 hover:text-[#FF6B35] transition-colors tracking-tight">
-            <span>←</span> Portfolio / {title}
+          <Link to="/gallery" className="inline-flex items-center gap-2 text-[12px] font-bold text-black/40 hover:text-[#FF6B35] transition-colors tracking-tight">
+            <span>←</span> Gallery / {title}
           </Link>
         </div>
 

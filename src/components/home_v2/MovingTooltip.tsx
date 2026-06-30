@@ -1,25 +1,35 @@
 import React from "react";
 
 export default function MovingTooltip() {
-  const text = "20% OFF YOUR FIRST ORDER • USE CODE: Z2FIRST • ";
-  
+  const promoItems = [
+    "20% Off Your First Order",
+    "Use Code: Z2First"
+  ];
+
   return (
-    <div className="relative w-full bg-[#FF6B35] py-4 overflow-hidden border-y border-black/5 z-20">
-      <div className="flex whitespace-nowrap animate-marquee-fast">
-        {[...Array(10)].map((_, i) => (
-          <span key={i} className="text-white font-black text-[14px] md:text-[18px] uppercase tracking-[0.2em] px-4">
-            {text}
-          </span>
+    <div className="relative w-full bg-[#0C0608] py-3 overflow-hidden border-y border-white/5 z-20">
+      <div className="flex whitespace-nowrap animate-marquee-promo items-center">
+        {[...Array(20)].map((_, i) => (
+          <React.Fragment key={i}>
+            {promoItems.map((text, idx) => (
+              <div key={`${i}-${idx}`} className="flex items-center gap-8 px-4">
+                <span className="text-white font-bold text-[10px] md:text-[11px] uppercase tracking-[0.3em]">
+                  {text}
+                </span>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#FF6B35] shrink-0" />
+              </div>
+            ))}
+          </React.Fragment>
         ))}
       </div>
       <style>{`
-        @keyframes marquee-fast {
+        @keyframes marquee-promo {
           0% { transform: translateX(0); }
           100% { transform: translateX(-50%); }
         }
-        .animate-marquee-fast {
+        .animate-marquee-promo {
           display: flex;
-          animation: marquee-fast 20s linear infinite;
+          animation: marquee-promo 30s linear infinite;
           will-change: transform;
         }
       `}</style>
