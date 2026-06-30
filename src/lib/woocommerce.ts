@@ -11,31 +11,20 @@ const requestHeaders = {
 
 const auth = `consumer_key=${ck}&consumer_secret=${cs}`;
 
-/**
- * MEDIA PROXY SANITIZER
- * Forces all site-wide images through the Vercel/Vite asset tunnel
- */
 export function sanitizeImageUrl(url: string): string {
   if (!url) return "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521130/blog_assets/dsitt1fhtiod9dkndedz.png";
   let clean = url.replace(/\\/g, "").replace(/"/g, "");
-  if (clean.startsWith(WP_DOMAIN)) {
-    return clean.replace(WP_DOMAIN, "");
-  }
+  if (clean.startsWith(WP_DOMAIN)) return clean.replace(WP_DOMAIN, "");
   return clean;
 }
 
-// 1. GALLERY & PORTFOLIO ENGINE
+// 1. BOSS-MANDATED GALLERY ENGINE (STRICT)
 export async function getGalleryItems(categoryId?: number) {
   try {
     let url = `${baseUrl}/wp-api/wp/v2/gallery?_embed&per_page=100&cb=${Date.now()}`;
     if (categoryId) url += `&gallery_category=${categoryId}`;
     const res = await fetch(url, { headers: requestHeaders });
-    const data = await res.json();
-    if (data.length === 0) {
-      const pRes = await fetch(`${baseUrl}/wp-api/wp/v2/portfolio?_embed&per_page=100`, { headers: requestHeaders });
-      return pRes.json();
-    }
-    return data;
+    return res.ok ? res.json() : [];
   } catch (e) { return []; }
 }
 
@@ -50,11 +39,8 @@ export async function getGalleryCategories() {
 
 export async function getSingleWPPortfolio(slug: string) {
   try {
-    let res = await fetch(`${baseUrl}/wp-api/wp/v2/gallery?slug=${slug}&_embed`, { headers: requestHeaders });
-    let items = await res.json();
-    if (items.length > 0) return items[0];
-    res = await fetch(`${baseUrl}/wp-api/wp/v2/portfolio?slug=${slug}&_embed`, { headers: requestHeaders });
-    items = await res.json();
+    const res = await fetch(`${baseUrl}/wp-api/wp/v2/gallery?slug=${slug}&_embed`, { headers: requestHeaders });
+    const items = await res.json();
     return items.length > 0 ? items[0] : null;
   } catch (e) { return null; }
 }

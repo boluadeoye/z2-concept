@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Inbox } from "lucide-react";
 import { Reveal } from "../shared/Reveal";
 import { getGalleryItems, getGalleryCategories } from "../../lib/woocommerce";
 
@@ -22,13 +22,19 @@ export default function PortfolioGrid() {
   useEffect(() => {
     async function initGallery() {
       setLoading(true);
-      const [catData, itemData] = await Promise.all([
-        getGalleryCategories(),
-        getGalleryItems()
-      ]);
-      setCategories(catData);
-      setProjects(itemData);
-      setLoading(false);
+      try {
+        const [catData, itemData] = await Promise.all([
+          getGalleryCategories(),
+          getGalleryItems()
+        ]);
+        setCategories(catData || []);
+        setProjects(itemData || []);
+      } catch (error) {
+        console.error("Gallery Init Error:", error);
+        setProjects([]);
+      } finally {
+        setLoading(false);
+      }
     }
     initGallery();
   }, []);
@@ -36,9 +42,14 @@ export default function PortfolioGrid() {
   const handleFilter = async (id: number | null) => {
     setActiveCat(id);
     setLoading(true);
-    const filteredData = await getGalleryItems(id || undefined);
-    setProjects(filteredData);
-    setLoading(false);
+    try {
+      const filteredData = await getGalleryItems(id || undefined);
+      setProjects(filteredData || []);
+    } catch (error) {
+      setProjects([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -55,7 +66,6 @@ export default function PortfolioGrid() {
         </Reveal>
       </div>
 
-      {/* DYNAMIC FILTER BAR */}
       <div className="flex gap-3 mb-16 overflow-x-auto pb-4 no-scrollbar">
         <button
           onClick={() => handleFilter(null)}
@@ -82,7 +92,7 @@ export default function PortfolioGrid() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-pulse">
           {[1, 2, 3].map((i) => <div key={i} className="aspect-square bg-black/5 rounded-[40px]" />)}
         </div>
-      ) : (
+      ) : projects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {projects.map((project, i) => (
             <Reveal key={project.id} delay={i * 0.1}>
@@ -105,6 +115,14 @@ export default function PortfolioGrid() {
               </Link>
             </Reveal>
           ))}
+        </div>
+      ) : (
+        <div className="py-32 flex flex-col items-center justify-center text-center">
+          <div className="w-20 h-20 rounded-full bg-black/5 flex items-center justify-center mb-6">
+            <Inbox size={32} className="text-black/20" />
+          </div>
+          <h3 className="text-2xl font-black text-black mb-2">No Projects Found In Our Gallery</h3>
+          <p className="text-black/40 max-w-xs mx-auto">We are currently updating our portfolio. Please check back soon for our latest works.</p>
         </div>
       )}
     </section>
