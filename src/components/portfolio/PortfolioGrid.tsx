@@ -1,24 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Inbox } from "lucide-react";
+import { ArrowUpRight, AlertTriangle, Inbox } from "lucide-react";
 import { Reveal } from "../shared/Reveal";
-import { getGalleryItems, getGalleryCategories } from "../../lib/woocommerce";
-
-const WP_DOMAIN = "https://sleigh.staymedia.ng";
-
-const normalizeUrl = (url: string): string => {
-  if (!url) return "";
-  let clean = url.replace(/\\/g, "").replace(/"/g, "");
-  if (clean.startsWith(WP_DOMAIN)) return clean.replace(WP_DOMAIN, "");
-  return clean;
-};
-
-const extractFirstImage = (html: string): string | null => {
-  if (!html) return null;
-  const imgRegex = /<img[^>]+(?:src|data-src)=["']([^"']+)["'][^>]*>/i;
-  const match = imgRegex.exec(html);
-  return match ? normalizeUrl(match[1]) : null;
-};
+import { getGalleryItems, getGalleryCategories, sanitizeImageUrl } from "../../lib/woocommerce";
 
 export default function PortfolioGrid() {
   const [projects, setProjects] = useState<any[]>([]);
@@ -35,9 +19,15 @@ export default function PortfolioGrid() {
           getGalleryItems()
         ]);
         setCategories(catData || []);
-        setProjects(itemData || []);
+        
+        const mapped = (itemData || []).map((item: any) => ({
+          id: item.id,
+          slug: item.slug,
+          title: item.title?.rendered || "Untitled Project",
+          img: sanitizeImageUrl(item._embedded?.['wp:featuredmedia']?.[0]?.source_url)
+        }));
+        setProjects(mapped);
       } catch (error) {
-        console.error("Gallery Init Error:", error);
         setProjects([]);
       } finally {
         setLoading(false);
@@ -50,9 +40,15 @@ export default function PortfolioGrid() {
     setActiveCat(id);
     setLoading(true);
     try {
-      const filteredData = await getGalleryItems(id || undefined);
-      setProjects(filteredData || []);
-    } catch (error) {
+      const data = await getGalleryItems(id || undefined);
+      const mapped = (data || []).map((item: any) => ({
+        id: item.id,
+        slug: item.slug,
+        title: item.title?.rendered || "Untitled Project",
+        img: sanitizeImageUrl(item._embedded?.['wp:featuredmedia']?.[0]?.source_url)
+      }));
+      setProjects(mapped);
+    } catch (e) {
       setProjects([]);
     } finally {
       setLoading(false);
@@ -73,28 +69,30 @@ export default function PortfolioGrid() {
         </Reveal>
       </div>
 
-      {/* DYNAMIC FILTER BAR */}
-      <div className="flex gap-3 mb-16 overflow-x-auto pb-4 no-scrollbar">
-        <button
-          onClick={() => handleFilter(null)}
-          className={`px-8 py-3 rounded-full text-[11px] font-bold transition-all whitespace-nowrap border ${
-            activeCat === null ? "bg-[#FF6B35] text-white border-[#FF6B35] shadow-xl" : "bg-white border-black/5 text-black/40"
-          }`}
-        >
-          ALL
-        </button>
-        {categories.map((cat) => (
+      {/* DYNAMIC CATEGORY BAR: Only shows if categories exist in DB */}
+      {categories.length > 0 && (
+        <div className="flex gap-3 mb-16 overflow-x-auto pb-4 no-scrollbar">
           <button
-            key={cat.id}
-            onClick={() => handleFilter(cat.id)}
+            onClick={() => handleFilter(null)}
             className={`px-8 py-3 rounded-full text-[11px] font-bold transition-all whitespace-nowrap border ${
-              activeCat === cat.id ? "bg-[#FF6B35] text-white border-[#FF6B35] shadow-xl" : "bg-white border-black/5 text-black/40"
+              activeCat === null ? "bg-[#FF6B35] text-white border-[#FF6B35] shadow-xl" : "bg-white border-black/5 text-black/40"
             }`}
           >
-            {cat.name.toUpperCase()}
+            ALL
           </button>
-        ))}
-      </div>
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => handleFilter(cat.id)}
+              className={`px-8 py-3 rounded-full text-[11px] font-bold transition-all whitespace-nowrap border ${
+                activeCat === cat.id ? "bg-[#FF6B35] text-white border-[#FF6B35] shadow-xl" : "bg-white border-black/5 text-black/40"
+              }`}
+            >
+              {cat.name.toUpperCase()}
+            </button>
+          ))}
+        </div>
+      )}
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 animate-pulse">
@@ -102,45 +100,43 @@ export default function PortfolioGrid() {
         </div>
       ) : projects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {projects.map((project, i) => {
-            const featuredImg = project._embedded?.['wp:featuredmedia']?.[0]?.source_url;
-            const contentImg = extractFirstImage(project.content?.rendered || project.excerpt?.rendered);
-            const displayImg = normalizeUrl(featuredImg) || contentImg;
-
-            return (
-              <Reveal key={project.id} delay={i * 0.1}>
-                <Link to={`/gallery/${project.slug}`} className="group flex flex-col h-full">
-                  <div className="relative aspect-square rounded-[40px] overflow-hidden mb-6 shadow-2xl border border-black/5 bg-white">
-                    {displayImg ? (
-                      <img 
-                        src={displayImg} 
-                        alt={project.title?.rendered} 
-                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-black/5 text-black/10 font-black text-4xl">Z2</div>
-                    )}
-                  </div>
-                  <div className="p-8 rounded-[32px] bg-white text-black border border-black/5 flex items-center justify-between transition-all duration-500 group-hover:bg-[#FF6B35] group-hover:text-white group-hover:shadow-2xl group-hover:shadow-[#FF6B35]/30">
-                    <span className="text-xl font-bold tracking-tight leading-tight pr-4">
-                      {project.title?.rendered}
-                    </span>
-                    <div className="w-12 h-12 rounded-full bg-[#FF6B35]/10 text-[#FF6B35] group-hover:bg-white/20 group-hover:text-white flex items-center justify-center shrink-0 transition-all">
-                      <ArrowUpRight size={24} />
+          {projects.map((project, i) => (
+            <Reveal key={project.id} delay={i * 0.1}>
+              <Link 
+                to={`/gallery/${project.slug}`} 
+                className="group flex flex-col h-full min-h-[450px] relative"
+              >
+                <div className="relative aspect-square rounded-[40px] overflow-hidden mb-6 shadow-2xl border border-black/5 bg-white flex-shrink-0">
+                  {project.img ? (
+                    <img 
+                      src={project.img} 
+                      alt={project.title} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-black/5 text-black/20 font-black text-xs gap-2">
+                      <AlertTriangle size={24} />
+                      <p>MEDIA MISSING</p>
                     </div>
+                  )}
+                </div>
+                <div className="p-8 rounded-[32px] bg-white text-black border border-black/5 flex items-center justify-between transition-all duration-500 group-hover:bg-[#FF6B35] group-hover:text-white group-hover:shadow-2xl group-hover:shadow-[#FF6B35]/30 flex-1">
+                  <span className="text-xl font-bold tracking-tight leading-tight pr-4">
+                    {project.title}
+                  </span>
+                  <div className="w-12 h-12 rounded-full bg-[#FF6B35]/10 text-[#FF6B35] group-hover:bg-white/20 group-hover:text-white flex items-center justify-center shrink-0 transition-all">
+                    <ArrowUpRight size={24} />
                   </div>
-                </Link>
-              </Reveal>
-            );
-          })}
+                </div>
+              </Link>
+            </Reveal>
+          ))}
         </div>
       ) : (
         <div className="py-32 flex flex-col items-center justify-center text-center">
-          <div className="w-20 h-20 rounded-full bg-black/5 flex items-center justify-center mb-6">
-            <Inbox size={32} className="text-black/20" />
-          </div>
-          <h3 className="text-2xl font-black text-black mb-2">No Projects Found In Our Gallery</h3>
-          <p className="text-black/40 max-w-xs mx-auto">We are currently updating our portfolio. Please check back soon for our latest works.</p>
+          <Inbox size={48} className="text-black/10 mb-4" />
+          <h3 className="text-2xl font-black text-black mb-2">No Projects Found</h3>
+          <p className="text-black/40">Check back soon for our latest works.</p>
         </div>
       )}
     </section>
