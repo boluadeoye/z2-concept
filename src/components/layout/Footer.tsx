@@ -5,14 +5,14 @@ import { Mail, Phone, MapPin } from "lucide-react";
 export default function Footer() {
   return (
     <footer className="relative bg-[#0C0608] text-white py-20 md:py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      {/* BACKGROUND LAYER: Calibrated Editorial Texture */}
+      {/* BACKGROUND LAYER: High-Visibility Photographic Asset */}
       <div className="absolute inset-0 z-0">
         <img 
           src="https://res.cloudinary.com/dwbjb3svx/image/upload/v1782137329/blog_assets/vubakrtom9syeaeravih.jpg" 
           alt="Footer Background" 
           className="w-full h-full object-cover object-center opacity-100"
         />
-        <div className="absolute inset-0 bg-black/80" />
+        <div className="absolute inset-0 bg-black/70" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto">
@@ -45,7 +45,7 @@ export default function Footer() {
               <ul className="space-y-4 text-[14px] text-white/50 font-medium">
                 <li><Link to="/" className="hover:text-white transition-colors">Home</Link></li>
                 <li><Link to="/services" className="hover:text-white transition-colors">Services</Link></li>
-                <li><Link to="/portfolio" className="hover:text-white transition-colors">Our works</Link></li>
+                <li><Link to="/gallery" className="hover:text-white transition-colors">Our works</Link></li>
                 <li><Link to="/about" className="hover:text-white transition-colors">About</Link></li>
               </ul>
             </div>
@@ -61,13 +61,16 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* CONTACT US: Ireland HQ Data */}
-            <div className="col-span-2 md:col-span-1 min-w-0 md:min-w-[240px]">
+            {/* CONTACT US: Dual Email + Ireland HQ Data */}
+            <div className="col-span-2 md:col-span-1 min-w-0 md:min-w-[260px]">
               <h4 className="text-[#FF6B35] font-bold text-[15px] mb-6 md:mb-10">Contact Us</h4>
               <ul className="space-y-5 text-[14px] text-white/70 font-medium">
-                <li className="flex items-center gap-4">
-                  <Mail size={18} className="text-[#8B7E3D] shrink-0" />
-                  <span className="truncate">info@z2concepts.com</span>
+                <li className="flex items-start gap-4">
+                  <Mail size={18} className="text-[#8B7E3D] shrink-0 mt-1" />
+                  <div className="flex flex-col gap-1">
+                    <span className="truncate">info@z2concepts.com</span>
+                    <span className="truncate">kefeehptech@outlook.com</span>
+                  </div>
                 </li>
                 <li className="flex items-center gap-4">
                   <Phone size={18} className="text-[#8B7E3D] shrink-0" />
