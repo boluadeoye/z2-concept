@@ -4,7 +4,7 @@ import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
 import WhatsAppChat from './components/shared/WhatsAppChat';
 
-// Homepage Components
+// Version 2 Components
 import HeroV2 from './components/home_v2/HeroV2';
 import MovingTooltip from './components/home_v2/MovingTooltip';
 import VideoPlaylist from './components/home_v2/VideoPlaylist';
@@ -38,7 +38,7 @@ const ScrollToTop = () => {
 };
 
 const Home = () => (
-  <div className="w-full block">
+  <div className="relative w-full block">
     <HeroV2 />
     <MovingTooltip />
     <VideoPlaylist />
@@ -50,7 +50,15 @@ const Home = () => (
   </div>
 );
 
-export default function App() {
+const NotFound = () => (
+  <div className="min-h-[60vh] flex flex-col items-center justify-center gap-6 bg-[#0C0608]">
+    <h1 className="text-6xl font-black text-white opacity-10">404</h1>
+    <h2 className="text-2xl font-bold uppercase tracking-widest text-white">Page Not Found</h2>
+    <a href="/" className="px-8 py-3 bg-[#FF6B35] text-black rounded font-bold text-sm">Return Home</a>
+  </div>
+);
+
+function App() {
   return (
     <div className="min-h-screen flex flex-col bg-[#0C0608]">
       <ScrollToTop />
@@ -73,6 +81,7 @@ export default function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
       <Footer />
@@ -80,3 +89,5 @@ export default function App() {
     </div>
   );
 }
+
+export default App;
