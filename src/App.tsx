@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import Navbar from './components/layout/Navbar';
 import Footer from './components/layout/Footer';
+import WhatsAppChat from './components/shared/WhatsAppChat';
 
 // Version 2 Components
 import HeroV2 from './components/home_v2/HeroV2';
@@ -78,6 +79,7 @@ function App() {
         </Routes>
       </div>
       <Footer />
+      <WhatsAppChat />
     </div>
   );
 }
