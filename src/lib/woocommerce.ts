@@ -11,20 +11,27 @@ const requestHeaders = {
 
 const auth = `consumer_key=${ck}&consumer_secret=${cs}`;
 
+/**
+ * MEDIA PROXY SANITIZER
+ * Forces all site-wide images through the Vercel/Vite asset tunnel
+ */
 export function sanitizeImageUrl(url: string): string {
   if (!url) return "https://res.cloudinary.com/dwbjb3svx/image/upload/v1781521130/blog_assets/dsitt1fhtiod9dkndedz.png";
   let clean = url.replace(/\\/g, "").replace(/"/g, "");
-  if (clean.startsWith(WP_DOMAIN)) return clean.replace(WP_DOMAIN, "");
+  if (clean.startsWith(WP_DOMAIN)) {
+    return clean.replace(WP_DOMAIN, "");
+  }
   return clean;
 }
 
-// 1. BOSS-MANDATED GALLERY ENGINE (STRICT)
+// 1. GALLERY & PORTFOLIO ENGINE (BOSS MANDATED)
 export async function getGalleryItems(categoryId?: number) {
   try {
-    let url = `${baseUrl}/wp-api/wp/v2/gallery?_embed&per_page=100&cb=${Date.now()}`;
+    let url = `${baseUrl}/wp-api/wp/v2/gallery?_embed=1&status=publish&per_page=100&cb=${Date.now()}`;
     if (categoryId) url += `&gallery_category=${categoryId}`;
     const res = await fetch(url, { headers: requestHeaders });
-    return res.ok ? res.json() : [];
+    if (!res.ok) return [];
+    return res.json();
   } catch (e) { return []; }
 }
 
@@ -32,14 +39,14 @@ export const getWPGalleries = getGalleryItems;
 
 export async function getGalleryCategories() {
   try {
-    const res = await fetch(`${baseUrl}/wp-api/wp/v2/gallery_category`, { headers: requestHeaders });
+    const res = await fetch(`${baseUrl}/wp-api/wp/v2/gallery_category?hide_empty=false`, { headers: requestHeaders });
     return res.ok ? res.json() : [];
   } catch (e) { return []; }
 }
 
 export async function getSingleWPPortfolio(slug: string) {
   try {
-    const res = await fetch(`${baseUrl}/wp-api/wp/v2/gallery?slug=${slug}&_embed`, { headers: requestHeaders });
+    const res = await fetch(`${baseUrl}/wp-api/wp/v2/gallery?slug=${slug}&_embed=1&cb=${Date.now()}`, { headers: requestHeaders });
     const items = await res.json();
     return items.length > 0 ? items[0] : null;
   } catch (e) { return null; }
@@ -62,7 +69,7 @@ export async function getWooProducts(categorySlug?: string) {
       if (id) url += `&category=${id}`;
     }
     const res = await fetch(url, { headers: requestHeaders });
-    return res.json();
+    return res.ok ? res.json() : [];
   } catch (e) { return []; }
 }
 
@@ -76,7 +83,7 @@ export async function getSingleProduct(id: string) {
 // 3. BLOG ENGINE
 export async function getWPPosts() {
   try {
-    const res = await fetch(`${baseUrl}/wp-api/wp/v2/posts?_embed&per_page=10`, { headers: requestHeaders });
+    const res = await fetch(`${baseUrl}/wp-api/wp/v2/posts?_embed=1&per_page=10&cb=${Date.now()}`, { headers: requestHeaders });
     return res.ok ? res.json() : [];
   } catch (e) { return []; }
 }

@@ -13,6 +13,13 @@ const normalizeUrl = (url: string): string => {
   return clean;
 };
 
+const extractFirstImage = (html: string): string | null => {
+  if (!html) return null;
+  const imgRegex = /<img[^>]+(?:src|data-src)=["']([^"']+)["'][^>]*>/i;
+  const match = imgRegex.exec(html);
+  return match ? normalizeUrl(match[1]) : null;
+};
+
 export default function PortfolioGrid() {
   const [projects, setProjects] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -66,6 +73,7 @@ export default function PortfolioGrid() {
         </Reveal>
       </div>
 
+      {/* DYNAMIC FILTER BAR */}
       <div className="flex gap-3 mb-16 overflow-x-auto pb-4 no-scrollbar">
         <button
           onClick={() => handleFilter(null)}
@@ -94,27 +102,37 @@ export default function PortfolioGrid() {
         </div>
       ) : projects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {projects.map((project, i) => (
-            <Reveal key={project.id} delay={i * 0.1}>
-              <Link to={`/gallery/${project.slug}`} className="group flex flex-col h-full">
-                <div className="relative aspect-square rounded-[40px] overflow-hidden mb-6 shadow-2xl border border-black/5 bg-white">
-                  <img 
-                    src={normalizeUrl(project._embedded?.['wp:featuredmedia']?.[0]?.source_url)} 
-                    alt={project.title?.rendered} 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
-                  />
-                </div>
-                <div className={`p-8 rounded-[32px] flex items-center justify-between transition-all duration-500 flex-1 min-h-[120px] ${
-                  i === 1 ? "bg-[#FF6B35] text-white shadow-2xl" : "bg-white text-black border border-black/5"
-                }`}>
-                  <span className="text-xl font-bold tracking-tight leading-tight pr-4">{project.title?.rendered}</span>
-                  <div className="w-12 h-12 rounded-full bg-black/5 flex items-center justify-center shrink-0">
-                    <ArrowUpRight size={24} />
+          {projects.map((project, i) => {
+            const featuredImg = project._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+            const contentImg = extractFirstImage(project.content?.rendered || project.excerpt?.rendered);
+            const displayImg = normalizeUrl(featuredImg) || contentImg;
+
+            return (
+              <Reveal key={project.id} delay={i * 0.1}>
+                <Link to={`/gallery/${project.slug}`} className="group flex flex-col h-full">
+                  <div className="relative aspect-square rounded-[40px] overflow-hidden mb-6 shadow-2xl border border-black/5 bg-white">
+                    {displayImg ? (
+                      <img 
+                        src={displayImg} 
+                        alt={project.title?.rendered} 
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-black/5 text-black/10 font-black text-4xl">Z2</div>
+                    )}
                   </div>
-                </div>
-              </Link>
-            </Reveal>
-          ))}
+                  <div className="p-8 rounded-[32px] bg-white text-black border border-black/5 flex items-center justify-between transition-all duration-500 group-hover:bg-[#FF6B35] group-hover:text-white group-hover:shadow-2xl group-hover:shadow-[#FF6B35]/30">
+                    <span className="text-xl font-bold tracking-tight leading-tight pr-4">
+                      {project.title?.rendered}
+                    </span>
+                    <div className="w-12 h-12 rounded-full bg-[#FF6B35]/10 text-[#FF6B35] group-hover:bg-white/20 group-hover:text-white flex items-center justify-center shrink-0 transition-all">
+                      <ArrowUpRight size={24} />
+                    </div>
+                  </div>
+                </Link>
+              </Reveal>
+            );
+          })}
         </div>
       ) : (
         <div className="py-32 flex flex-col items-center justify-center text-center">
