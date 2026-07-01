@@ -38,7 +38,6 @@ const ScrollToTop = () => {
 };
 
 const Home = () => (
-  /* FORCE DARK THEME ONLY FOR HOMEPAGE */
   <div className="w-full block bg-[#0C0608] text-white">
     <HeroV2 />
     <MovingTooltip />

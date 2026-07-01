@@ -35,7 +35,6 @@ export async function getGalleryItems(categoryId?: number) {
   } catch (e) { return []; }
 }
 
-// CRITICAL ALIAS RESTORED
 export const getWPGalleries = getGalleryItems;
 
 export async function getGalleryCategories() {
