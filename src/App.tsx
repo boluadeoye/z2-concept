@@ -38,7 +38,8 @@ const ScrollToTop = () => {
 };
 
 const Home = () => (
-  <main className="w-full block">
+  /* FORCE DARK THEME ONLY FOR HOMEPAGE */
+  <div className="w-full block bg-[#0C0608] text-white">
     <HeroV2 />
     <MovingTooltip />
     <VideoPlaylist />
@@ -47,20 +48,12 @@ const Home = () => (
     <FindUsSection />
     <AboutSection />
     <ProductGridV2 />
-  </main>
-);
-
-const NotFound = () => (
-  <div className="min-h-[60vh] flex flex-col items-center justify-center gap-6 bg-[#0C0608] text-white">
-    <h1 className="text-6xl font-black opacity-10">404</h1>
-    <h2 className="text-2xl font-bold uppercase tracking-widest">Page Not Found</h2>
-    <a href="/" className="px-8 py-3 bg-[#FF6B35] text-black rounded font-bold text-sm">Return Home</a>
   </div>
 );
 
 export default function App() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#0C0608]">
+    <div className="min-h-screen flex flex-col">
       <ScrollToTop />
       <Navbar />
       <div className="flex-1 w-full pt-20">
@@ -81,7 +74,6 @@ export default function App() {
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
       <Footer />

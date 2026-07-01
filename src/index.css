@@ -3,25 +3,32 @@
 @theme {
   --color-primary: #8B7E3D;
   --color-accent: #FF6B35;
-  --color-background: #0C0608;
+  --color-background: #FDF8F0;
+  --color-ink: #0C0608;
   --color-white: #FFFFFF;
   --font-sans: "Bricolage Grotesque", sans-serif;
 }
 
 @layer base {
-  html, body {
+  html {
+    scroll-behavior: smooth;
+    font-family: var(--font-sans);
+  }
+  body {
+    /* RESTORE DARK TEXT AS DEFAULT */
+    @apply bg-[#FDF8F0] text-[#0C0608] antialiased;
+    width: 100%;
     margin: 0;
     padding: 0;
-    width: 100% !important;
-    min-width: 100% !important;
-    overflow-x: hidden;
-    background-color: #0C0608;
-    color: white;
-    display: block !important;
   }
 }
 
 @utility no-scrollbar {
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
+}
+
+.font-serif-italic {
+  font-family: serif !important;
+  font-style: italic !important;
 }

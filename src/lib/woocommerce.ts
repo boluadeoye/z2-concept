@@ -3,8 +3,10 @@ const cs = import.meta.env.VITE_WC_CONSUMER_SECRET;
 const baseUrl = ''; 
 const WP_DOMAIN = "https://sleigh.staymedia.ng";
 
-const requestHeaders: any = {
-  "Accept": "application/json"
+const requestHeaders = {
+  "Content-Type": "application/json",
+  "Accept": "application/json",
+  "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 };
 
 const auth = `consumer_key=${ck}&consumer_secret=${cs}`;
@@ -18,9 +20,7 @@ export function extractContentImage(html: string): string | null {
 export function sanitizeImageUrl(url: string | null): string | null {
   if (!url || url === "" || url.includes("undefined")) return null;
   let clean = url.replace(/\\/g, "").replace(/"/g, "");
-  if (clean.includes(WP_DOMAIN)) {
-    return clean.split(WP_DOMAIN)[1];
-  }
+  if (clean.includes(WP_DOMAIN)) return clean.split(WP_DOMAIN)[1];
   if (clean.startsWith("http")) return clean;
   return clean.startsWith("/") ? clean : `/${clean}`;
 }
@@ -28,49 +28,51 @@ export function sanitizeImageUrl(url: string | null): string | null {
 // 1. GALLERY ENGINE
 export async function getGalleryItems(categoryId?: number) {
   try {
-    let url = `/wp-api/wp/v2/gallery?_embed=1&per_page=100`;
+    let url = `${baseUrl}/wp-api/wp/v2/gallery?_embed=1&status=publish&per_page=100`;
     if (categoryId) url += `&gallery_category=${categoryId}`;
     const res = await fetch(url, { headers: requestHeaders });
-    if (!res.ok) return [];
-    return await res.json();
+    return res.ok ? res.json() : [];
   } catch (e) { return []; }
 }
 
+// CRITICAL ALIAS RESTORED
 export const getWPGalleries = getGalleryItems;
 
 export async function getGalleryCategories() {
   try {
-    const res = await fetch(`/wp-api/wp/v2/gallery_category?hide_empty=true`, { headers: requestHeaders });
+    const res = await fetch(`${baseUrl}/wp-api/wp/v2/gallery_category?hide_empty=true`, { headers: requestHeaders });
     return res.ok ? res.json() : [];
   } catch (e) { return []; }
 }
 
 export async function getSingleWPPortfolio(slug: string) {
   try {
-    const res = await fetch(`/wp-api/wp/v2/gallery?slug=${slug}&_embed=1`, { headers: requestHeaders });
+    const res = await fetch(`${baseUrl}/wp-api/wp/v2/gallery?slug=${slug}&_embed=1`, { headers: requestHeaders });
     const items = await res.json();
     return items.length > 0 ? items[0] : null;
   } catch (e) { return null; }
 }
 
 // 2. PRODUCT ENGINE
-export async function getWooProducts(categorySlug?: string) {
+export async function getWooProducts(categoryId?: number) {
   try {
-    const res = await fetch(`/wp-api/wc/v3/products?${auth}&per_page=12&status=publish`, { headers: requestHeaders });
+    let url = `${baseUrl}/wp-api/wc/v3/products?${auth}&per_page=12&status=publish`;
+    if (categoryId) url += `&category=${categoryId}`;
+    const res = await fetch(url, { headers: requestHeaders });
     return res.ok ? res.json() : [];
   } catch (e) { return []; }
 }
 
 export async function getSingleProduct(id: string) {
   try {
-    const res = await fetch(`/wp-api/wc/v3/products/${id}?${auth}`, { headers: requestHeaders });
+    const res = await fetch(`${baseUrl}/wp-api/wc/v3/products/${id}?${auth}`, { headers: requestHeaders });
     return res.ok ? res.json() : null;
   } catch (e) { return null; }
 }
 
 export async function getCategoryIdBySlug(slug: string) {
   try {
-    const res = await fetch(`/wp-api/wc/v3/products/categories?slug=${slug}&${auth}`, { headers: requestHeaders });
+    const res = await fetch(`${baseUrl}/wp-api/wc/v3/products/categories?slug=${slug}&${auth}`, { headers: requestHeaders });
     const categories = await res.json();
     return categories.length > 0 ? categories[0].id : null;
   } catch (e) { return null; }
@@ -79,14 +81,14 @@ export async function getCategoryIdBySlug(slug: string) {
 // 3. BLOG & AUTH ENGINE
 export async function getWPPosts() {
   try {
-    const res = await fetch(`/wp-api/wp/v2/posts?_embed=1&per_page=10`, { headers: requestHeaders });
+    const res = await fetch(`${baseUrl}/wp-api/wp/v2/posts?_embed=1&per_page=10`, { headers: requestHeaders });
     return res.ok ? res.json() : [];
   } catch (e) { return []; }
 }
 
 export async function loginUser(username: string, password: string) {
   try {
-    const res = await fetch(`/wp-api/jwt-auth/v1/token`, {
+    const res = await fetch(`${baseUrl}/wp-api/jwt-auth/v1/token`, {
       method: "POST",
       headers: requestHeaders,
       body: JSON.stringify({ username, password }),
@@ -99,7 +101,7 @@ export async function loginUser(username: string, password: string) {
 
 export async function registerUser(userData: any) {
   try {
-    const res = await fetch(`/wp-api/wc/v3/customers?${auth}`, {
+    const res = await fetch(`${baseUrl}/wp-api/wc/v3/customers?${auth}`, {
       method: "POST",
       headers: requestHeaders,
       body: JSON.stringify({
@@ -118,21 +120,21 @@ export async function registerUser(userData: any) {
 // 4. DASHBOARD & TRANSACTIONS
 export async function getCustomerData(id: string | number) {
   try {
-    const res = await fetch(`/wp-api/wc/v3/customers/${id}?${auth}`, { headers: requestHeaders });
+    const res = await fetch(`${baseUrl}/wp-api/wc/v3/customers/${id}?${auth}`, { headers: requestHeaders });
     return res.ok ? res.json() : null;
   } catch (e) { return null; }
 }
 
 export async function getCustomerOrders(id: string | number) {
   try {
-    const res = await fetch(`/wp-api/wc/v3/orders?customer=${id}&${auth}`, { headers: requestHeaders });
+    const res = await fetch(`${baseUrl}/wp-api/wc/v3/orders?customer=${id}&${auth}`, { headers: requestHeaders });
     return res.ok ? res.json() : [];
   } catch (e) { return []; }
 }
 
 export async function updateCustomerAddress(id: string | number, data: any) {
   try {
-    const res = await fetch(`/wp-api/wc/v3/customers/${id}?${auth}`, {
+    const res = await fetch(`${baseUrl}/wp-api/wc/v3/customers/${id}?${auth}`, {
       method: "PUT",
       headers: requestHeaders,
       body: JSON.stringify({ shipping: data, billing: data })
@@ -143,7 +145,7 @@ export async function updateCustomerAddress(id: string | number, data: any) {
 
 export async function createWooOrder(payload: any) {
   try {
-    const res = await fetch(`/wp-api/wc/v3/orders?${auth}`, {
+    const res = await fetch(`${baseUrl}/wp-api/wc/v3/orders?${auth}`, {
       method: "POST",
       headers: requestHeaders,
       body: JSON.stringify(payload)
@@ -161,7 +163,7 @@ export async function submitInquiry(name: string, email: string, message: string
     formData.append("your-email", email);
     formData.append("your-message", message);
     formData.append("_wpcf7", FORM_ID);
-    const res = await fetch(`/wp-api/contact-form-7/v1/contact-forms/${FORM_ID}/feedback`, {
+    const res = await fetch(`${baseUrl}/wp-api/contact-form-7/v1/contact-forms/${FORM_ID}/feedback`, {
       method: "POST",
       body: formData
     });
@@ -172,7 +174,7 @@ export async function submitInquiry(name: string, email: string, message: string
 
 export async function sendPasswordResetEmail(userLogin: string) {
   try {
-    const res = await fetch(`/wp-api/z2/v1/forgot-password`, {
+    const res = await fetch(`${baseUrl}/wp-api/z2/v1/forgot-password`, {
       method: "POST",
       headers: requestHeaders,
       body: JSON.stringify({ user_login: userLogin }),
@@ -183,7 +185,7 @@ export async function sendPasswordResetEmail(userLogin: string) {
 
 export async function finalizePasswordReset(payload: any) {
   try {
-    const res = await fetch(`/wp-api/z2/v1/reset-password`, {
+    const res = await fetch(`${baseUrl}/wp-api/z2/v1/reset-password`, {
       method: "POST",
       headers: requestHeaders,
       body: JSON.stringify(payload),
